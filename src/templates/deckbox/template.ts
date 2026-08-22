@@ -1,4 +1,4 @@
-import type { BoxTemplate, PathSegment, PointMm, RectMm } from "../../types/box";
+import type { ArtworkClip, BoxTemplate, PathSegment, PointMm, RectMm } from "../../types/box";
 
 const pageWidthMm = 431.8;
 const pageHeightMm = 279.4;
@@ -39,12 +39,147 @@ const vLeftShoulder = { x: backCenterX - 66, y: frontTop };
 const vRightShoulder = { x: backCenterX + 66, y: frontTop };
 const lidWingWidth = depth;
 
-const frontPanel: RectMm = {
+const backPanel: RectMm = {
   x: columnX,
   y: frontTop,
   width: panelWidth,
   height: panelHeight,
 };
+const frontPanel: RectMm = {
+  x: backX,
+  y: frontTop,
+  width: panelWidth,
+  height: panelHeight,
+};
+const frontCoverPanel: RectMm = {
+  x: columnX,
+  y: lidTop,
+  width: panelWidth,
+  height: lidHeight,
+};
+const topPanel: RectMm = {
+  x: columnX,
+  y: midTop,
+  width: panelWidth,
+  height: midPanelHeight,
+};
+const rightSidePanel: RectMm = {
+  x: rightSideX,
+  y: frontTop,
+  width: depth,
+  height: panelHeight,
+};
+const outerSidePanel: RectMm = {
+  x: outerSideX,
+  y: frontTop,
+  width: rightSideWidth,
+  height: panelHeight,
+};
+const leftCoverWingPoints: PointMm[] = [
+  { x: columnX, y: lidTop },
+  { x: columnX - 12, y: lidTop },
+  { x: columnX - lidWingWidth, y: midTop - 9 },
+  { x: columnX - lidWingWidth, y: midTop },
+  { x: columnX, y: midTop },
+];
+const rightCoverWingPoints: PointMm[] = [
+  { x: columnRight, y: lidTop },
+  { x: columnRight + 12, y: lidTop },
+  { x: columnRight + lidWingWidth, y: midTop - 9 },
+  { x: columnRight + lidWingWidth, y: midTop },
+  { x: columnRight, y: midTop },
+];
+const leftCoverWingRenderRect: RectMm = {
+  x: columnX - lidWingWidth,
+  y: lidTop,
+  width: depth,
+  height: panelHeight,
+};
+const rightCoverWingRenderRect: RectMm = {
+  x: columnRight,
+  y: lidTop,
+  width: depth,
+  height: panelHeight,
+};
+const frontCoverRenderRect: RectMm = {
+  x: frontCoverPanel.x,
+  y: midTop - panelHeight,
+  width: frontCoverPanel.width,
+  height: panelHeight,
+};
+const leftCoverWingArtworkRect: RectMm = {
+  ...leftCoverWingRenderRect,
+  y: midTop - panelHeight,
+};
+const rightCoverWingArtworkRect: RectMm = {
+  ...rightCoverWingRenderRect,
+  y: midTop - panelHeight,
+};
+const glueFlapRect: RectMm = { x: glueX, y: frontTop, width: glueWidth, height: panelHeight };
+const leftHingeFlapPoints: PointMm[] = [
+  { x: columnX, y: midTop },
+  { x: columnX - 38, y: midTop + 27 },
+  { x: columnX - 32, y: midTop + 36 },
+  { x: columnX, y: frontTop },
+];
+const rightHingeFlapPoints: PointMm[] = [
+  { x: columnRight, y: midTop },
+  { x: columnRight + 38, y: midTop + 27 },
+  { x: columnRight + 32, y: midTop + 36 },
+  { x: columnRight, y: frontTop },
+];
+const bodyStripPoints: PointMm[] = [
+  { x: columnRight, y: frontTop },
+  vLeftShoulder,
+  vApex,
+  vRightShoulder,
+  { x: rightOuter, y: frontTop },
+  { x: rightOuter, y: frontBottom },
+  { x: columnRight, y: frontBottom },
+];
+const vCutoutPoints: PointMm[] = [vLeftShoulder, vRightShoulder, vApex];
+const backBottomFlapPoints: PointMm[] = [
+  { x: columnX, y: frontBottom },
+  { x: columnRight, y: frontBottom },
+  { x: columnRight - 3, y: bottomBottom },
+  { x: columnX + 56, y: bottomBottom },
+  { x: columnX + 47, y: frontBottom + depth / 2 },
+  { x: columnX + 37, y: frontBottom + depth / 2 },
+  { x: columnX + 33, y: bottomBottom },
+  { x: columnX + 9, y: bottomBottom },
+  { x: columnX, y: frontBottom },
+];
+const leftSideBottomFlapPoints: PointMm[] = [
+  { x: rightSideX, y: frontBottom },
+  { x: backX, y: frontBottom },
+  { x: backX - 8, y: frontBottom + 20 },
+  { x: rightSideX + 12, y: frontBottom + 20 },
+  { x: rightSideX, y: frontBottom },
+];
+const frontBottomFlapPoints: PointMm[] = [
+  { x: backX, y: frontBottom },
+  { x: outerSideX, y: frontBottom },
+  { x: outerSideX - 3, y: bottomBottom },
+  { x: backX + 56, y: bottomBottom },
+  { x: backX + 47, y: frontBottom + depth / 2 },
+  { x: backX + 37, y: frontBottom + depth / 2 },
+  { x: backX + 33, y: bottomBottom },
+  { x: backX + 9, y: bottomBottom },
+  { x: backX, y: frontBottom },
+];
+const rightSideBottomFlapPoints: PointMm[] = [
+  { x: outerSideX, y: frontBottom },
+  { x: rightOuter, y: frontBottom },
+  { x: rightOuter - 8, y: frontBottom + 20 },
+  { x: outerSideX + 12, y: frontBottom + 20 },
+  { x: outerSideX, y: frontBottom },
+];
+const tongueSlotPoints: PointMm[] = [
+  { x: backX + 16, y: frontTop + 62.7 },
+  { x: backX + 57, y: frontTop + 62.7 },
+  { x: backX + 61, y: frontTop + 65.9 },
+  { x: backX + 12, y: frontTop + 65.9 },
+];
 
 const line = (from: PointMm, to: PointMm): PathSegment => ({
   type: "line",
@@ -63,7 +198,38 @@ const path = (d: string): PathSegment => ({
   d,
 });
 
-const topProngCut = path(`
+const rectRegion = (rect: RectMm): ArtworkClip => ({
+  type: "rect",
+  rect,
+});
+
+const polygonRegion = (points: PointMm[]): ArtworkClip => ({
+  type: "polygon",
+  points,
+});
+
+const insetRect = (rect: RectMm, insetX: number, insetY: number): RectMm => ({
+  x: rect.x + insetX,
+  y: rect.y + insetY,
+  width: rect.width - insetX * 2,
+  height: rect.height - insetY * 2,
+});
+
+const scalePolygon = (points: PointMm[], scale: number): PointMm[] => {
+  const xs = points.map((point) => point.x);
+  const ys = points.map((point) => point.y);
+  const center = {
+    x: (Math.min(...xs) + Math.max(...xs)) / 2,
+    y: (Math.min(...ys) + Math.max(...ys)) / 2,
+  };
+
+  return points.map((point) => ({
+    x: center.x + (point.x - center.x) * scale,
+    y: center.y + (point.y - center.y) * scale,
+  }));
+};
+
+const topProngCutD = `
   M ${columnX} ${lidTop}
   L ${columnX} ${tongueTop + 5.6}
   C ${columnX} ${tongueTop + 2.4}, ${columnX + 2.4} ${tongueTop}, ${columnX + 5.6} ${tongueTop}
@@ -79,7 +245,10 @@ const topProngCut = path(`
   L ${columnX + 69.4} ${tongueTop}
   C ${columnX + 72.6} ${tongueTop}, ${columnRight} ${tongueTop + 2.4}, ${columnRight} ${tongueTop + 5.6}
   L ${columnRight} ${lidTop}
-`);
+`;
+
+const topProngFillD = `${topProngCutD} Z`;
+const topProngCut = path(topProngCutD);
 
 export const deckboxTemplate: BoxTemplate = {
   id: "deckbox",
@@ -91,37 +260,37 @@ export const deckboxTemplate: BoxTemplate = {
     {
       id: "lid",
       label: "FRONT COVER",
-      rect: { x: columnX, y: lidTop, width: panelWidth, height: lidHeight },
+      rect: frontCoverPanel,
     },
     {
       id: "hinge",
       label: "TOP",
-      rect: { x: columnX, y: midTop, width: panelWidth, height: midPanelHeight },
+      rect: topPanel,
     },
     {
       id: "front",
       label: "BACK",
-      rect: frontPanel,
+      rect: backPanel,
     },
     {
       id: "right-side",
       label: "SIDE",
-      rect: { x: rightSideX, y: frontTop, width: depth, height: panelHeight },
+      rect: rightSidePanel,
     },
     {
       id: "back",
       label: "FRONT",
-      rect: { x: backX, y: frontTop, width: panelWidth, height: panelHeight },
+      rect: frontPanel,
     },
     {
       id: "outer-side",
       label: "SIDE",
-      rect: { x: outerSideX, y: frontTop, width: rightSideWidth, height: panelHeight },
+      rect: outerSidePanel,
     },
     {
       id: "glue",
       label: "GLUE",
-      rect: { x: glueX, y: frontTop, width: glueWidth, height: panelHeight },
+      rect: glueFlapRect,
     },
   ],
   calibrationMark: {
@@ -129,38 +298,126 @@ export const deckboxTemplate: BoxTemplate = {
     y: pageHeightMm - 18,
     length: 50,
   },
+  artworkRegions: [
+    {
+      id: "front",
+      slot: "front",
+      clip: { type: "rect", rect: frontPanel },
+      anchorRect: frontPanel,
+      renderRect: frontPanel,
+    },
+    {
+      id: "front-cover",
+      slot: "front",
+      clip: { type: "rect", rect: frontCoverPanel },
+      anchorRect: frontPanel,
+      renderRect: frontCoverRenderRect,
+      rotationDegrees: 180,
+    },
+    {
+      id: "front-cover-tongue",
+      slot: "front",
+      clip: { type: "path", d: topProngFillD },
+      anchorRect: frontPanel,
+      renderRect: frontCoverRenderRect,
+      rotationDegrees: 180,
+    },
+    {
+      id: "back",
+      slot: "back",
+      clip: { type: "rect", rect: backPanel },
+      anchorRect: backPanel,
+      renderRect: backPanel,
+    },
+    {
+      id: "top",
+      slot: "top",
+      clip: { type: "rect", rect: topPanel },
+      anchorRect: topPanel,
+      renderRect: topPanel,
+    },
+    {
+      id: "right-side",
+      slot: "leftSide",
+      clip: { type: "rect", rect: rightSidePanel },
+      anchorRect: rightSidePanel,
+      renderRect: rightSidePanel,
+    },
+    {
+      id: "outer-side",
+      slot: "rightSide",
+      clip: { type: "rect", rect: outerSidePanel },
+      anchorRect: outerSidePanel,
+      renderRect: outerSidePanel,
+    },
+    {
+      id: "left-cover-wing",
+      slot: "rightSide",
+      clip: { type: "polygon", points: leftCoverWingPoints },
+      anchorRect: outerSidePanel,
+      renderRect: leftCoverWingArtworkRect,
+      rotationDegrees: 180,
+    },
+    {
+      id: "right-cover-wing",
+      slot: "leftSide",
+      clip: { type: "polygon", points: rightCoverWingPoints },
+      anchorRect: rightSidePanel,
+      renderRect: rightCoverWingArtworkRect,
+      rotationDegrees: 180,
+    },
+  ],
+  backgroundRegions: [
+    { type: "path", d: topProngFillD },
+    rectRegion(frontCoverPanel),
+    polygonRegion(leftCoverWingPoints),
+    polygonRegion(rightCoverWingPoints),
+    rectRegion(topPanel),
+    polygonRegion(leftHingeFlapPoints),
+    polygonRegion(rightHingeFlapPoints),
+    rectRegion(backPanel),
+    rectRegion(glueFlapRect),
+    polygonRegion(bodyStripPoints),
+    polygonRegion(backBottomFlapPoints),
+    polygonRegion(leftSideBottomFlapPoints),
+    polygonRegion(frontBottomFlapPoints),
+    polygonRegion(rightSideBottomFlapPoints),
+  ],
+  knockoutRegions: [
+    polygonRegion(vCutoutPoints),
+    polygonRegion(tongueSlotPoints),
+  ],
+  glueRegions: [
+    rectRegion(insetRect(glueFlapRect, 4, 10)),
+    polygonRegion(scalePolygon(leftHingeFlapPoints, 0.58)),
+    polygonRegion(scalePolygon(rightHingeFlapPoints, 0.58)),
+    polygonRegion(scalePolygon(leftSideBottomFlapPoints, 0.58)),
+    polygonRegion(scalePolygon(rightSideBottomFlapPoints, 0.58)),
+  ],
+  backGlueAnnotations: [
+    {
+      label: "glue on\nback",
+      text: { x: columnX - 31, y: tongueTop + 9 },
+      arrowFrom: { x: columnX - 19, y: tongueTop + 12 },
+      arrowTo: { x: columnX - 3, y: tongueTop + 12 },
+    },
+    {
+      label: "glue on\nback",
+      text: { x: columnRight + 31, y: tongueTop + 9 },
+      arrowFrom: { x: columnRight + 19, y: tongueTop + 12 },
+      arrowTo: { x: columnRight + 3, y: tongueTop + 12 },
+    },
+  ],
   cutPaths: [
     topProngCut,
 
-    // Lid dust flaps, wide and angled like the reference photo.
-    poly([
-      { x: columnX, y: lidTop },
-      { x: columnX - 12, y: lidTop },
-      { x: columnX - lidWingWidth, y: midTop - 9 },
-      { x: columnX - lidWingWidth, y: midTop },
-      { x: columnX, y: midTop },
-    ]),
-    poly([
-      { x: columnRight, y: lidTop },
-      { x: columnRight + 12, y: lidTop },
-      { x: columnRight + lidWingWidth, y: midTop - 9 },
-      { x: columnRight + lidWingWidth, y: midTop },
-      { x: columnRight, y: midTop },
-    ]),
+    // Lid dust flaps, wide and angled to match the current deckbox geometry.
+    poly(leftCoverWingPoints),
+    poly(rightCoverWingPoints),
 
     // Hinge side flaps.
-    poly([
-      { x: columnX, y: midTop },
-      { x: columnX - 38, y: midTop + 27 },
-      { x: columnX - 32, y: midTop + 36 },
-      { x: columnX, y: frontTop },
-    ]),
-    poly([
-      { x: columnRight, y: midTop },
-      { x: columnRight + 38, y: midTop + 27 },
-      { x: columnRight + 32, y: midTop + 36 },
-      { x: columnRight, y: frontTop },
-    ]),
+    poly(leftHingeFlapPoints),
+    poly(rightHingeFlapPoints),
 
     // Main front column edges.
     line({ x: columnX, y: lidTop }, { x: columnX, y: frontTop }),
@@ -176,53 +433,13 @@ export const deckboxTemplate: BoxTemplate = {
     ]),
 
     // Right-hand body strip, including the deep V-shaped receiving cut above the slot panel.
-    poly([
-      { x: columnRight, y: frontTop },
-      vLeftShoulder,
-      vApex,
-      vRightShoulder,
-      { x: rightOuter, y: frontTop },
-      { x: rightOuter, y: frontBottom },
-      { x: columnRight, y: frontBottom },
-    ]),
+    poly(bodyStripPoints),
 
-    // Bottom flaps are deliberately varied to match the photographed blank more closely.
-    poly([
-      { x: columnX, y: frontBottom },
-      { x: columnRight, y: frontBottom },
-      { x: columnRight - 6, y: bottomBottom },
-      { x: columnX + 56, y: bottomBottom },
-      { x: columnX + 47, y: frontBottom + depth / 2 },
-      { x: columnX + 37, y: frontBottom + depth / 2 },
-      { x: columnX + 33, y: bottomBottom },
-      { x: columnX + 9, y: bottomBottom },
-      { x: columnX, y: frontBottom },
-    ]),
-    poly([
-      { x: rightSideX, y: frontBottom },
-      { x: backX, y: frontBottom },
-      { x: backX - 8, y: frontBottom + 20 },
-      { x: rightSideX + 12, y: frontBottom + 20 },
-      { x: rightSideX, y: frontBottom },
-    ]),
-    poly([
-      { x: backX, y: frontBottom },
-      { x: outerSideX, y: frontBottom },
-      { x: outerSideX - 6, y: bottomBottom },
-      { x: backX + 56, y: bottomBottom },
-      { x: backX + 47, y: frontBottom + depth / 2 },
-      { x: backX + 37, y: frontBottom + depth / 2 },
-      { x: backX + 33, y: bottomBottom },
-      { x: backX + 9, y: bottomBottom },
-      { x: backX, y: frontBottom },
-    ]),
-    poly([
-      { x: outerSideX, y: frontBottom },
-      { x: rightOuter, y: frontBottom },
-      { x: rightOuter - 8, y: frontBottom + 20 },
-      { x: outerSideX + 12, y: frontBottom + 20 },
-      { x: outerSideX, y: frontBottom },
-    ]),
+    // Bottom flaps are deliberately varied so the locking flaps slot together cleanly.
+    poly(backBottomFlapPoints),
+    poly(leftSideBottomFlapPoints),
+    poly(frontBottomFlapPoints),
+    poly(rightSideBottomFlapPoints),
   ],
   scorePaths: [
     line({ x: columnX, y: lidTop }, { x: columnRight, y: lidTop }),
@@ -243,14 +460,6 @@ export const deckboxTemplate: BoxTemplate = {
     line({ x: outerSideX, y: frontTop }, { x: rightOuter, y: frontTop }),
   ],
   slotPaths: [
-    poly(
-      [
-        { x: backX + 16, y: frontTop + 62.7 },
-        { x: backX + 57, y: frontTop + 62.7 },
-        { x: backX + 61, y: frontTop + 65.9 },
-        { x: backX + 12, y: frontTop + 65.9 },
-      ],
-      true,
-    ),
+    poly(tongueSlotPoints, true),
   ],
 };

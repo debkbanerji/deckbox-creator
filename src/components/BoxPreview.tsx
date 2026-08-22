@@ -1,25 +1,33 @@
 import { useId, useRef } from "react";
-import type { ArtworkPlacement, ImageInfo } from "../types/artwork";
-import type { BoxTemplate, PathSegment, PointMm } from "../types/box";
+import type { ArtworkBySlot, ArtworkSlotId } from "../types/artwork";
+import type { ArtworkClip, ArtworkRegion, BoxTemplate, PathSegment, PointMm } from "../types/box";
 import { getArtworkDrawRect } from "../image/effectiveDpi";
 
 type Props = {
   template: BoxTemplate;
-  image: ImageInfo | null;
-  placement: ArtworkPlacement;
-  onPan: (deltaXmm: number, deltaYmm: number) => void;
+  artwork: ArtworkBySlot;
+  activeSlot: ArtworkSlotId;
+  backgroundColor: string;
+  onSelectSlot: (slot: ArtworkSlotId) => void;
+  onPan: (slot: ArtworkSlotId, deltaXmm: number, deltaYmm: number) => void;
 };
 
 export function BoxPreview({
   template,
-  image,
-  placement,
+  artwork,
+  activeSlot,
+  backgroundColor,
+  onSelectSlot,
   onPan,
 }: Props) {
-  const clipId = useId();
+  const clipId = useId().replace(/:/g, "");
+  const arrowMarkerId = `${clipId}-arrow`;
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const dragStart = useRef<PointMm | null>(null);
-  const artworkRect = image ? getArtworkDrawRect(image, template.frontPanel, placement) : null;
+  const dragStart = useRef<{
+    slot: ArtworkSlotId;
+    point: PointMm;
+    rotationDegrees: ArtworkRegion["rotationDegrees"];
+  } | null>(null);
   const dimensionPanel =
     template.panels.find((panel) => panel.label === "BACK")?.rect ?? template.frontPanel;
 
@@ -63,22 +71,30 @@ export function BoxPreview({
           ))}
         </g>
 
-        <clipPath id={clipId}>
-          <rect
-            x={template.frontPanel.x}
-            y={template.frontPanel.y}
-            width={template.frontPanel.width}
-            height={template.frontPanel.height}
-          />
-        </clipPath>
+        <defs>
+          <marker
+            id={arrowMarkerId}
+            markerWidth="5"
+            markerHeight="5"
+            refX="4.5"
+            refY="2.5"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <path d="M 0 0 L 5 2.5 L 0 5 z" fill="#000000" />
+          </marker>
+          {template.artworkRegions.map((region) => (
+            <clipPath key={region.id} id={`${clipId}-${region.id}`}>
+              {renderClip(region.clip)}
+            </clipPath>
+          ))}
+        </defs>
 
-        <rect
-          x={template.frontPanel.x}
-          y={template.frontPanel.y}
-          width={template.frontPanel.width}
-          height={template.frontPanel.height}
-          className="front-panel-empty"
-        />
+        <g className="template-backgrounds">
+          {template.backgroundRegions.map((region, index) => (
+            <g key={index}>{renderClip(region, { fill: backgroundColor })}</g>
+          ))}
+        </g>
 
         <g className="panel-labels">
           {template.panels.map((panel) => (
@@ -116,58 +132,201 @@ export function BoxPreview({
           </text>
         </g>
 
-        {image && artworkRect && (
-          <g clipPath={`url(#${clipId})`}>
-            <image
-              href={image.url}
-              x={artworkRect.x}
-              y={artworkRect.y}
-              width={artworkRect.width}
-              height={artworkRect.height}
-              preserveAspectRatio="none"
-            />
-          </g>
-        )}
+        <g className="artwork-regions">
+          {template.artworkRegions.map((region) =>
+            renderArtworkRegion(region, artwork, `${clipId}-${region.id}`),
+          )}
+        </g>
 
-        <rect
-          x={template.frontPanel.x}
-          y={template.frontPanel.y}
-          width={template.frontPanel.width}
-          height={template.frontPanel.height}
-          className="front-panel-hit"
-          onPointerDown={(event) => {
-            if (!image) {
-              return;
+        <g className="knockout-regions">
+          {template.knockoutRegions.map((region, index) => (
+            <g key={index}>{renderClip(region, { fill: "#ffffff" })}</g>
+          ))}
+        </g>
+
+        <g className="glue-regions">
+          {template.glueRegions.map((region, index) => (
+            <g key={index}>{renderClip(region, { fill: "#ffffff" })}</g>
+          ))}
+        </g>
+
+        <g className="glue-labels">
+          {template.glueRegions.map((region, index) => {
+            const center = getClipCenter(region);
+            if (!center) {
+              return null;
             }
-            dragStart.current = getSvgPoint(event);
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            if (!dragStart.current) {
-              return;
-            }
-            const next = getSvgPoint(event);
-            if (!next) {
-              return;
-            }
-            onPan(next.x - dragStart.current.x, next.y - dragStart.current.y);
-            dragStart.current = next;
-          }}
-          onPointerUp={() => {
-            dragStart.current = null;
-          }}
-          onPointerCancel={() => {
-            dragStart.current = null;
-          }}
-        />
+
+            return (
+              <text key={index} x={center.x} y={center.y}>
+                GLUE
+              </text>
+            );
+          })}
+        </g>
+
+        <g className="back-glue-annotations">
+          {template.backGlueAnnotations.map((annotation, index) => (
+            <g key={index}>
+              <line
+                x1={annotation.arrowFrom.x}
+                y1={annotation.arrowFrom.y}
+                x2={annotation.arrowTo.x}
+                y2={annotation.arrowTo.y}
+                markerEnd={`url(#${arrowMarkerId})`}
+              />
+              <text x={annotation.text.x} y={annotation.text.y}>
+                {annotation.label.split("\n").map((line, lineIndex) => (
+                  <tspan key={line} x={annotation.text.x} dy={lineIndex === 0 ? 0 : 5}>
+                    {line}
+                  </tspan>
+                ))}
+              </text>
+            </g>
+          ))}
+        </g>
 
         <g className="score-lines">{template.scorePaths.map((path, index) => renderPath(path, index))}</g>
         <g className="cut-lines">{template.cutPaths.map((path, index) => renderPath(path, index))}</g>
         <g className="slot-lines">{template.slotPaths.map((path, index) => renderPath(path, index))}</g>
 
+        <g className="artwork-hit-regions">
+          {template.artworkRegions.map((region) => (
+            <g
+              key={region.id}
+              className={region.slot === activeSlot ? "is-active" : undefined}
+              onPointerDown={(event) => {
+                onSelectSlot(region.slot);
+                const slotArtwork = artwork[region.slot];
+                if (!slotArtwork.image) {
+                  return;
+                }
+
+                const start = getSvgPoint(event);
+                if (!start) {
+                  return;
+                }
+
+                dragStart.current = {
+                  slot: region.slot,
+                  point: start,
+                  rotationDegrees: region.rotationDegrees,
+                };
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerMove={(event) => {
+                if (!dragStart.current) {
+                  return;
+                }
+
+                const next = getSvgPoint(event);
+                if (!next) {
+                  return;
+                }
+
+                const deltaX = next.x - dragStart.current.point.x;
+                const deltaY = next.y - dragStart.current.point.y;
+                const direction = dragStart.current.rotationDegrees === 180 ? -1 : 1;
+
+                onPan(dragStart.current.slot, deltaX * direction, deltaY * direction);
+                dragStart.current = { ...dragStart.current, point: next };
+              }}
+              onPointerUp={() => {
+                dragStart.current = null;
+              }}
+              onPointerCancel={() => {
+                dragStart.current = null;
+              }}
+            >
+              {renderClip(region.clip, { fill: "transparent" })}
+            </g>
+          ))}
+        </g>
       </svg>
     </section>
   );
+}
+
+function renderArtworkRegion(region: ArtworkRegion, artwork: ArtworkBySlot, clipId: string) {
+  const slotArtwork = artwork[region.slot];
+  if (!slotArtwork.image) {
+    return null;
+  }
+
+  const drawRect = getArtworkDrawRect(
+    slotArtwork.image,
+    region.anchorRect,
+    slotArtwork.placement,
+  );
+  const xOffset = region.renderRect.x - region.anchorRect.x;
+  const yOffset = region.renderRect.y - region.anchorRect.y;
+  const rotation = region.rotationDegrees ?? 0;
+  const imageTransform =
+    rotation === 180
+      ? `rotate(180 ${region.renderRect.x + region.renderRect.width / 2} ${
+          region.renderRect.y + region.renderRect.height / 2
+        })`
+      : undefined;
+
+  return (
+    <g key={region.id} clipPath={`url(#${clipId})`}>
+      <image
+        href={slotArtwork.image.url}
+        x={drawRect.x + xOffset}
+        y={drawRect.y + yOffset}
+        width={drawRect.width}
+        height={drawRect.height}
+        transform={imageTransform}
+        preserveAspectRatio="none"
+      />
+    </g>
+  );
+}
+
+function renderClip(clip: ArtworkClip, attributes: { fill?: string } = {}) {
+  if (clip.type === "rect") {
+    return (
+      <rect
+        x={clip.rect.x}
+        y={clip.rect.y}
+        width={clip.rect.width}
+        height={clip.rect.height}
+        {...attributes}
+      />
+    );
+  }
+
+  if (clip.type === "path") {
+    return <path d={clip.d} {...attributes} />;
+  }
+
+  return (
+    <polygon
+      points={clip.points.map((point) => `${point.x},${point.y}`).join(" ")}
+      {...attributes}
+    />
+  );
+}
+
+function getClipCenter(clip: ArtworkClip): PointMm | null {
+  if (clip.type === "rect") {
+    return {
+      x: clip.rect.x + clip.rect.width / 2,
+      y: clip.rect.y + clip.rect.height / 2,
+    };
+  }
+
+  if (clip.type === "polygon") {
+    return clip.points.reduce(
+      (total, point) => ({
+        x: total.x + point.x / clip.points.length,
+        y: total.y + point.y / clip.points.length,
+      }),
+      { x: 0, y: 0 },
+    );
+  }
+
+  return null;
 }
 
 function renderPath(path: PathSegment, index: number) {
@@ -176,10 +335,10 @@ function renderPath(path: PathSegment, index: number) {
   }
 
   if (path.type === "path") {
-    return <path key={index} d={path.d} />;
+    return <path key={index} d={path.d} fill="none" style={{ fill: "none" }} />;
   }
 
   const renderedPoints = path.closed ? [...path.points, path.points[0]] : path.points;
   const points = renderedPoints.map((point) => `${point.x},${point.y}`).join(" ");
-  return <polyline key={index} points={points} />;
+  return <polyline key={index} points={points} fill="none" style={{ fill: "none" }} />;
 }

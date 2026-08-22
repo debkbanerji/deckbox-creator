@@ -88,18 +88,64 @@ input:disabled {
   stroke: none;
 }
 
+.knockout-regions rect,
+.knockout-regions polygon,
+.knockout-regions path,
+.glue-regions rect,
+.glue-regions polygon,
+.glue-regions path {
+  fill: #ffffff;
+  pointer-events: none;
+}
+
+.glue-labels {
+  fill: #000000;
+  font-size: 3.8px;
+  font-weight: 750;
+  letter-spacing: 0;
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.back-glue-annotations {
+  fill: #000000;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.back-glue-annotations line {
+  stroke: #000000;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.back-glue-annotations marker path {
+  fill: #000000;
+}
+
+.back-glue-annotations text {
+  font-size: 4.4px;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
 .front-panel-empty {
   fill: none;
   stroke: none;
 }
 
-.front-panel-hit {
+.artwork-hit-regions rect,
+.artwork-hit-regions polygon,
+.artwork-hit-regions path {
   cursor: grab;
   fill: transparent;
   pointer-events: all;
 }
 
-.front-panel-hit:active {
+.artwork-hit-regions rect:active,
+.artwork-hit-regions polygon:active,
+.artwork-hit-regions path:active {
   cursor: grabbing;
 }
 
@@ -175,11 +221,34 @@ input:disabled {
   box-shadow: 0 14px 35px rgba(16, 24, 40, 0.08);
 }
 
+.artwork-slots {
+  display: grid;
+  gap: 12px;
+}
+
+.artwork-slot {
+  display: grid;
+  gap: 8px;
+  border-radius: 7px;
+}
+
+.artwork-slot.is-active .upload-control,
+.artwork-slot.is-active .clear-image-button {
+  border-color: #0f766e;
+  box-shadow: inset 0 0 0 1px #0f766e;
+}
+
+.upload-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 8px;
+}
+
 .upload-control {
   display: inline-flex;
   min-height: 42px;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 9px;
   border-radius: 7px;
   border: 1px solid #c7ced8;
@@ -187,6 +256,24 @@ input:disabled {
   color: #17202a;
   cursor: pointer;
   font-weight: 650;
+}
+
+.clear-image-button {
+  display: inline-flex;
+  width: 42px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #c7ced8;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17202a;
+  cursor: pointer;
+}
+
+.clear-image-placeholder {
+  width: 42px;
+  min-height: 42px;
 }
 
 .upload-control {
@@ -201,15 +288,38 @@ input:disabled {
   cursor: pointer;
 }
 
-.upload-control span {
+.upload-label {
+  flex: 0 0 68px;
+}
+
+.upload-name {
+  min-width: 0;
+  flex: 1;
+  color: #5b6472;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.control-group {
+.slot-zoom {
+  display: grid;
+  gap: 6px;
+}
+
+.color-control {
   display: grid;
   gap: 8px;
+}
+
+.color-control input[type="color"] {
+  width: 100%;
+  height: 42px;
+  padding: 4px;
+  border: 1px solid #c7ced8;
+  border-radius: 7px;
+  background: #ffffff;
+  cursor: pointer;
 }
 
 .control-row {
@@ -224,68 +334,13 @@ input:disabled {
 input[type="range"] {
   width: 100%;
   accent-color: #0f766e;
+  cursor: pointer;
 }
 
-.upload-control:hover {
+.upload-control:hover,
+.clear-image-button:hover {
   border-color: #8aa0b8;
   background: #f8fafc;
-}
-
-.quality {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 38px;
-  border-radius: 7px;
-  padding: 9px 10px;
-  font-size: 13px;
-  font-weight: 650;
-}
-
-.quality-dot {
-  width: 9px;
-  height: 9px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.quality-empty {
-  color: #64748b;
-  background: #f1f5f9;
-}
-
-.quality-excellent {
-  color: #047857;
-  background: #ecfdf5;
-}
-
-.quality-good {
-  color: #0f766e;
-  background: #f0fdfa;
-}
-
-.quality-acceptable {
-  color: #9a6700;
-  background: #fff8db;
-}
-
-.quality-low {
-  color: #b42318;
-  background: #fff1f0;
-}
-
-.browser-pass {
-  display: inline-flex;
-  min-height: 38px;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  border-radius: 7px;
-  background: #eef6f5;
-  color: #0f766e;
-  font-size: 13px;
-  font-weight: 760;
 }
 
 @media (max-width: 900px) {

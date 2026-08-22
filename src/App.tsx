@@ -1,8 +1,7 @@
-import { useMemo, useState } from "react";
-import type { ArtworkPlacement, ImageInfo } from "./types/artwork";
+import { useState } from "react";
+import type { ArtworkBySlot, ArtworkPlacement, ArtworkSlotId, ImageInfo } from "./types/artwork";
 import { BoxPreview } from "./components/BoxPreview";
 import { Controls } from "./components/Controls";
-import { getEffectiveDpi } from "./image/effectiveDpi";
 import { deckboxTemplate } from "./templates/deckbox/template";
 
 const initialPlacement: ArtworkPlacement = {
@@ -11,27 +10,60 @@ const initialPlacement: ArtworkPlacement = {
   panYmm: 0,
 };
 
+function createInitialArtwork(): ArtworkBySlot {
+  return {
+    front: { image: null, placement: initialPlacement },
+    back: { image: null, placement: initialPlacement },
+    top: { image: null, placement: initialPlacement },
+    leftSide: { image: null, placement: initialPlacement },
+    rightSide: { image: null, placement: initialPlacement },
+  };
+}
+
 export default function App() {
-  const [image, setImage] = useState<ImageInfo | null>(null);
-  const [placement, setPlacement] = useState<ArtworkPlacement>(initialPlacement);
+  const [artwork, setArtwork] = useState<ArtworkBySlot>(createInitialArtwork);
+  const [activeSlot, setActiveSlot] = useState<ArtworkSlotId>("front");
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
 
-  const dpi = useMemo(() => {
-    if (!image) {
-      return null;
-    }
-
-    return getEffectiveDpi(image, deckboxTemplate.frontPanel, placement);
-  }, [image, placement]);
-
-  async function handleImageChange(file: File) {
+  async function handleImageChange(slot: ArtworkSlotId, file: File) {
     const url = URL.createObjectURL(file);
     const dimensions = await readImageDimensions(url);
-    setImage({
-      url,
-      name: file.name,
-      ...dimensions,
+    setActiveSlot(slot);
+    setArtwork((current) => {
+      const previousUrl = current[slot].image?.url;
+      if (previousUrl) {
+        URL.revokeObjectURL(previousUrl);
+      }
+
+      return {
+        ...current,
+        [slot]: {
+          image: {
+            url,
+            name: file.name,
+            ...dimensions,
+          },
+          placement: initialPlacement,
+        },
+      };
     });
-    setPlacement(initialPlacement);
+  }
+
+  function handleImageClear(slot: ArtworkSlotId) {
+    setArtwork((current) => {
+      const previousUrl = current[slot].image?.url;
+      if (previousUrl) {
+        URL.revokeObjectURL(previousUrl);
+      }
+
+      return {
+        ...current,
+        [slot]: {
+          image: null,
+          placement: initialPlacement,
+        },
+      };
+    });
   }
 
   return (
@@ -45,22 +77,44 @@ export default function App() {
       <div className="workspace">
         <BoxPreview
           template={deckboxTemplate}
-          image={image}
-          placement={placement}
-          onPan={(deltaXmm, deltaYmm) => {
-            setPlacement((current) => ({
+          artwork={artwork}
+          activeSlot={activeSlot}
+          backgroundColor={backgroundColor}
+          onSelectSlot={setActiveSlot}
+          onPan={(slot, deltaXmm, deltaYmm) => {
+            setArtwork((current) => ({
               ...current,
-              panXmm: current.panXmm + deltaXmm,
-              panYmm: current.panYmm + deltaYmm,
+              [slot]: {
+                ...current[slot],
+                placement: {
+                  ...current[slot].placement,
+                  panXmm: current[slot].placement.panXmm + deltaXmm,
+                  panYmm: current[slot].placement.panYmm + deltaYmm,
+                },
+              },
             }));
           }}
         />
         <Controls
-          image={image}
-          dpi={dpi}
-          zoom={placement.scale}
+          artwork={artwork}
+          activeSlot={activeSlot}
+          backgroundColor={backgroundColor}
+          onActiveSlotChange={setActiveSlot}
+          onBackgroundColorChange={setBackgroundColor}
           onImageChange={handleImageChange}
-          onZoomChange={(scale) => setPlacement((current) => ({ ...current, scale }))}
+          onImageClear={handleImageClear}
+          onZoomChange={(slot, scale) =>
+            setArtwork((current) => ({
+              ...current,
+              [slot]: {
+                ...current[slot],
+                placement: {
+                  ...current[slot].placement,
+                  scale,
+                },
+              },
+            }))
+          }
         />
       </div>
     </main>
