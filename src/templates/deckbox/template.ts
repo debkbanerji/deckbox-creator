@@ -19,35 +19,35 @@ const netHeight = tongueHeight + lidHeight + midPanelHeight + panelHeight + bott
 const xLeft = (pageWidthMm - netWidth) / 2;
 const yTop = (pageHeightMm - netHeight) / 2;
 
-const columnX = xLeft + leftDustWidth;
+const outerSideX = xLeft + glueWidth;
+const frontX = outerSideX + rightSideWidth;
+const rightSideX = frontX + panelWidth;
+const columnX = rightSideX + depth;
 const columnRight = columnX + panelWidth;
-const tongueTop = yTop;
-const lidTop = tongueTop + tongueHeight;
-const midTop = lidTop + lidHeight;
-const frontTop = midTop + midPanelHeight;
-const frontBottom = frontTop + panelHeight;
-const bottomBottom = frontBottom + bottomFlap;
+const glueX = columnRight;
+const rightOuter = glueX + glueWidth;
+const bodyTop = yTop + bottomFlap;
+const bodyBottom = bodyTop + panelHeight;
+const topPanelTop = bodyBottom;
+const lidTop = topPanelTop + midPanelHeight;
+const tongueTop = lidTop + lidHeight;
+const tongueBottom = tongueTop + tongueHeight;
 
-const rightSideX = columnRight;
-const backX = rightSideX + depth;
-const outerSideX = backX + panelWidth;
-const glueX = columnX - glueWidth;
-const rightOuter = outerSideX + rightSideWidth;
-const backCenterX = backX + panelWidth / 2;
-const vApex = { x: backCenterX, y: frontTop + 53 };
-const vLeftShoulder = { x: backCenterX - 66, y: frontTop };
-const vRightShoulder = { x: backCenterX + 66, y: frontTop };
+const frontCenterX = frontX + panelWidth / 2;
+const vApex = { x: frontCenterX, y: bodyTop + panelHeight - 53 };
+const vLeftShoulder = { x: frontCenterX + 66, y: bodyBottom };
+const vRightShoulder = { x: frontCenterX - 66, y: bodyBottom };
 const lidWingWidth = depth;
 
 const backPanel: RectMm = {
   x: columnX,
-  y: frontTop,
+  y: bodyTop,
   width: panelWidth,
   height: panelHeight,
 };
 const frontPanel: RectMm = {
-  x: backX,
-  y: frontTop,
+  x: frontX,
+  y: bodyTop,
   width: panelWidth,
   height: panelHeight,
 };
@@ -59,126 +59,126 @@ const frontCoverPanel: RectMm = {
 };
 const topPanel: RectMm = {
   x: columnX,
-  y: midTop,
+  y: topPanelTop,
   width: panelWidth,
   height: midPanelHeight,
 };
 const rightSidePanel: RectMm = {
   x: rightSideX,
-  y: frontTop,
+  y: bodyTop,
   width: depth,
   height: panelHeight,
 };
 const outerSidePanel: RectMm = {
   x: outerSideX,
-  y: frontTop,
+  y: bodyTop,
   width: rightSideWidth,
   height: panelHeight,
 };
 const leftCoverWingPoints: PointMm[] = [
-  { x: columnX, y: lidTop },
-  { x: columnX - 12, y: lidTop },
-  { x: columnX - lidWingWidth, y: midTop - 9 },
-  { x: columnX - lidWingWidth, y: midTop },
-  { x: columnX, y: midTop },
+  { x: columnRight, y: tongueTop },
+  { x: columnRight + 12, y: tongueTop },
+  { x: columnRight + lidWingWidth, y: lidTop + 9 },
+  { x: columnRight + lidWingWidth, y: lidTop },
+  { x: columnRight, y: lidTop },
 ];
 const rightCoverWingPoints: PointMm[] = [
-  { x: columnRight, y: lidTop },
-  { x: columnRight + 12, y: lidTop },
-  { x: columnRight + lidWingWidth, y: midTop - 9 },
-  { x: columnRight + lidWingWidth, y: midTop },
-  { x: columnRight, y: midTop },
+  { x: columnX, y: tongueTop },
+  { x: columnX - 12, y: tongueTop },
+  { x: columnX - lidWingWidth, y: lidTop + 9 },
+  { x: columnX - lidWingWidth, y: lidTop },
+  { x: columnX, y: lidTop },
 ];
 const leftCoverWingRenderRect: RectMm = {
-  x: columnX - lidWingWidth,
+  x: columnRight,
   y: lidTop,
   width: depth,
   height: panelHeight,
 };
 const rightCoverWingRenderRect: RectMm = {
-  x: columnRight,
+  x: columnX - lidWingWidth,
   y: lidTop,
   width: depth,
   height: panelHeight,
 };
 const frontCoverRenderRect: RectMm = {
   x: frontCoverPanel.x,
-  y: midTop - panelHeight,
+  y: lidTop,
   width: frontCoverPanel.width,
   height: panelHeight,
 };
 const leftCoverWingArtworkRect: RectMm = {
   ...leftCoverWingRenderRect,
-  y: midTop - panelHeight,
+  y: lidTop,
 };
 const rightCoverWingArtworkRect: RectMm = {
   ...rightCoverWingRenderRect,
-  y: midTop - panelHeight,
+  y: lidTop,
 };
-const glueFlapRect: RectMm = { x: glueX, y: frontTop, width: glueWidth, height: panelHeight };
+const glueFlapRect: RectMm = { x: glueX, y: bodyTop, width: glueWidth, height: panelHeight };
 const leftHingeFlapPoints: PointMm[] = [
-  { x: columnX, y: midTop },
-  { x: columnX - 38, y: midTop + 27 },
-  { x: columnX - 32, y: midTop + 36 },
-  { x: columnX, y: frontTop },
+  { x: columnRight, y: lidTop },
+  { x: columnRight + 38, y: topPanelTop + 23 },
+  { x: columnRight + 32, y: topPanelTop + 14 },
+  { x: columnRight, y: topPanelTop },
 ];
 const rightHingeFlapPoints: PointMm[] = [
-  { x: columnRight, y: midTop },
-  { x: columnRight + 38, y: midTop + 27 },
-  { x: columnRight + 32, y: midTop + 36 },
-  { x: columnRight, y: frontTop },
+  { x: columnX, y: lidTop },
+  { x: columnX - 38, y: topPanelTop + 23 },
+  { x: columnX - 32, y: topPanelTop + 14 },
+  { x: columnX, y: topPanelTop },
 ];
 const bodyStripPoints: PointMm[] = [
-  { x: columnRight, y: frontTop },
+  { x: columnX, y: bodyBottom },
   vLeftShoulder,
   vApex,
   vRightShoulder,
-  { x: rightOuter, y: frontTop },
-  { x: rightOuter, y: frontBottom },
-  { x: columnRight, y: frontBottom },
+  { x: outerSideX, y: bodyBottom },
+  { x: outerSideX, y: bodyTop },
+  { x: columnX, y: bodyTop },
 ];
 const vCutoutPoints: PointMm[] = [vLeftShoulder, vRightShoulder, vApex];
 const backBottomFlapPoints: PointMm[] = [
-  { x: columnX, y: frontBottom },
-  { x: columnRight, y: frontBottom },
-  { x: columnRight - 3, y: bottomBottom },
-  { x: columnX + 56, y: bottomBottom },
-  { x: columnX + 47, y: frontBottom + depth / 2 },
-  { x: columnX + 37, y: frontBottom + depth / 2 },
-  { x: columnX + 33, y: bottomBottom },
-  { x: columnX + 9, y: bottomBottom },
-  { x: columnX, y: frontBottom },
+  { x: columnRight, y: bodyTop },
+  { x: columnX, y: bodyTop },
+  { x: columnX + 3, y: yTop },
+  { x: columnX + 18, y: yTop },
+  { x: columnX + 27, y: bodyTop - depth / 2 },
+  { x: columnX + 37, y: bodyTop - depth / 2 },
+  { x: columnX + 41, y: yTop },
+  { x: columnRight - 9, y: yTop },
+  { x: columnRight, y: bodyTop },
 ];
 const leftSideBottomFlapPoints: PointMm[] = [
-  { x: rightSideX, y: frontBottom },
-  { x: backX, y: frontBottom },
-  { x: backX - 8, y: frontBottom + 20 },
-  { x: rightSideX + 12, y: frontBottom + 20 },
-  { x: rightSideX, y: frontBottom },
+  { x: columnX, y: bodyTop },
+  { x: rightSideX, y: bodyTop },
+  { x: rightSideX + 8, y: bodyTop - 20 },
+  { x: columnX - 12, y: bodyTop - 20 },
+  { x: columnX, y: bodyTop },
 ];
 const frontBottomFlapPoints: PointMm[] = [
-  { x: backX, y: frontBottom },
-  { x: outerSideX, y: frontBottom },
-  { x: outerSideX - 3, y: bottomBottom },
-  { x: backX + 56, y: bottomBottom },
-  { x: backX + 47, y: frontBottom + depth / 2 },
-  { x: backX + 37, y: frontBottom + depth / 2 },
-  { x: backX + 33, y: bottomBottom },
-  { x: backX + 9, y: bottomBottom },
-  { x: backX, y: frontBottom },
+  { x: rightSideX, y: bodyTop },
+  { x: frontX, y: bodyTop },
+  { x: frontX + 3, y: yTop },
+  { x: frontX + 18, y: yTop },
+  { x: frontX + 27, y: bodyTop - depth / 2 },
+  { x: frontX + 37, y: bodyTop - depth / 2 },
+  { x: frontX + 41, y: yTop },
+  { x: rightSideX - 9, y: yTop },
+  { x: rightSideX, y: bodyTop },
 ];
 const rightSideBottomFlapPoints: PointMm[] = [
-  { x: outerSideX, y: frontBottom },
-  { x: rightOuter, y: frontBottom },
-  { x: rightOuter - 8, y: frontBottom + 20 },
-  { x: outerSideX + 12, y: frontBottom + 20 },
-  { x: outerSideX, y: frontBottom },
+  { x: frontX, y: bodyTop },
+  { x: outerSideX, y: bodyTop },
+  { x: outerSideX + 8, y: bodyTop - 20 },
+  { x: frontX - 12, y: bodyTop - 20 },
+  { x: frontX, y: bodyTop },
 ];
 const tongueSlotPoints: PointMm[] = [
-  { x: backX + 16, y: frontTop + 62.7 },
-  { x: backX + 57, y: frontTop + 62.7 },
-  { x: backX + 61, y: frontTop + 65.9 },
-  { x: backX + 12, y: frontTop + 65.9 },
+  { x: frontX + 58, y: bodyTop + 37.3 },
+  { x: frontX + 17, y: bodyTop + 37.3 },
+  { x: frontX + 13, y: bodyTop + 34.1 },
+  { x: frontX + 62, y: bodyTop + 34.1 },
 ];
 
 const line = (from: PointMm, to: PointMm): PathSegment => ({
@@ -230,21 +230,21 @@ const scalePolygon = (points: PointMm[], scale: number): PointMm[] => {
 };
 
 const topProngCutD = `
-  M ${columnX} ${lidTop}
-  L ${columnX} ${tongueTop + 5.6}
-  C ${columnX} ${tongueTop + 2.4}, ${columnX + 2.4} ${tongueTop}, ${columnX + 5.6} ${tongueTop}
-  L ${columnX + 17.3} ${tongueTop}
-  C ${columnX + 20} ${tongueTop}, ${columnX + 21.6} ${tongueTop + 1.8}, ${columnX + 21.6} ${tongueTop + 4.6}
-  L ${columnX + 21.6} ${lidTop - 11.8}
-  C ${columnX + 21.6} ${lidTop - 8.2}, ${columnX + 24.5} ${lidTop - 6.1}, ${columnX + 28.1} ${lidTop - 6.1}
-  C ${columnX + 31.5} ${lidTop - 6.1}, ${columnX + 32.2} ${lidTop - 9.6}, ${columnX + 37.5} ${lidTop - 9.6}
-  C ${columnX + 42.8} ${lidTop - 9.6}, ${columnX + 43.5} ${lidTop - 6.1}, ${columnX + 46.9} ${lidTop - 6.1}
-  C ${columnX + 50.5} ${lidTop - 6.1}, ${columnX + 53.4} ${lidTop - 8.2}, ${columnX + 53.4} ${lidTop - 11.8}
-  L ${columnX + 53.4} ${tongueTop + 4.6}
-  C ${columnX + 53.4} ${tongueTop + 1.8}, ${columnX + 55} ${tongueTop}, ${columnX + 57.7} ${tongueTop}
-  L ${columnX + 69.4} ${tongueTop}
-  C ${columnX + 72.6} ${tongueTop}, ${columnRight} ${tongueTop + 2.4}, ${columnRight} ${tongueTop + 5.6}
-  L ${columnRight} ${lidTop}
+  M ${columnRight} ${tongueTop}
+  L ${columnRight} ${tongueBottom - 5.6}
+  C ${columnRight} ${tongueBottom - 2.4}, ${columnRight - 2.4} ${tongueBottom}, ${columnRight - 5.6} ${tongueBottom}
+  L ${columnRight - 17.3} ${tongueBottom}
+  C ${columnRight - 20} ${tongueBottom}, ${columnRight - 21.6} ${tongueBottom - 1.8}, ${columnRight - 21.6} ${tongueBottom - 4.6}
+  L ${columnRight - 21.6} ${tongueTop + 11.8}
+  C ${columnRight - 21.6} ${tongueTop + 8.2}, ${columnRight - 24.5} ${tongueTop + 6.1}, ${columnRight - 28.1} ${tongueTop + 6.1}
+  C ${columnRight - 31.5} ${tongueTop + 6.1}, ${columnRight - 32.2} ${tongueTop + 9.6}, ${columnRight - 37.5} ${tongueTop + 9.6}
+  C ${columnRight - 42.8} ${tongueTop + 9.6}, ${columnRight - 43.5} ${tongueTop + 6.1}, ${columnRight - 46.9} ${tongueTop + 6.1}
+  C ${columnRight - 50.5} ${tongueTop + 6.1}, ${columnRight - 53.4} ${tongueTop + 8.2}, ${columnRight - 53.4} ${tongueTop + 11.8}
+  L ${columnRight - 53.4} ${tongueBottom - 4.6}
+  C ${columnRight - 53.4} ${tongueBottom - 1.8}, ${columnRight - 55} ${tongueBottom}, ${columnRight - 57.7} ${tongueBottom}
+  L ${columnRight - 69.4} ${tongueBottom}
+  C ${columnRight - 72.6} ${tongueBottom}, ${columnX} ${tongueBottom - 2.4}, ${columnX} ${tongueBottom - 5.6}
+  L ${columnX} ${tongueTop}
 `;
 
 const topProngFillD = `${topProngCutD} Z`;
@@ -305,6 +305,7 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "rect", rect: frontPanel },
       anchorRect: frontPanel,
       renderRect: frontPanel,
+      rotationDegrees: 180,
     },
     {
       id: "front-cover",
@@ -312,7 +313,6 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "rect", rect: frontCoverPanel },
       anchorRect: frontPanel,
       renderRect: frontCoverRenderRect,
-      rotationDegrees: 180,
     },
     {
       id: "front-cover-tongue",
@@ -320,7 +320,6 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "path", d: topProngFillD },
       anchorRect: frontPanel,
       renderRect: frontCoverRenderRect,
-      rotationDegrees: 180,
     },
     {
       id: "back",
@@ -328,6 +327,7 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "rect", rect: backPanel },
       anchorRect: backPanel,
       renderRect: backPanel,
+      rotationDegrees: 180,
     },
     {
       id: "top",
@@ -335,6 +335,7 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "rect", rect: topPanel },
       anchorRect: topPanel,
       renderRect: topPanel,
+      rotationDegrees: 180,
     },
     {
       id: "right-side",
@@ -342,6 +343,7 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "rect", rect: rightSidePanel },
       anchorRect: rightSidePanel,
       renderRect: rightSidePanel,
+      rotationDegrees: 180,
     },
     {
       id: "outer-side",
@@ -349,6 +351,7 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "rect", rect: outerSidePanel },
       anchorRect: outerSidePanel,
       renderRect: outerSidePanel,
+      rotationDegrees: 180,
     },
     {
       id: "left-cover-wing",
@@ -356,7 +359,6 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "polygon", points: leftCoverWingPoints },
       anchorRect: outerSidePanel,
       renderRect: leftCoverWingArtworkRect,
-      rotationDegrees: 180,
     },
     {
       id: "right-cover-wing",
@@ -364,7 +366,6 @@ export const deckboxTemplate: BoxTemplate = {
       clip: { type: "polygon", points: rightCoverWingPoints },
       anchorRect: rightSidePanel,
       renderRect: rightCoverWingArtworkRect,
-      rotationDegrees: 180,
     },
   ],
   backgroundRegions: [
@@ -397,15 +398,15 @@ export const deckboxTemplate: BoxTemplate = {
   backGlueAnnotations: [
     {
       label: "glue on\nback",
-      text: { x: columnX - 31, y: tongueTop + 9 },
-      arrowFrom: { x: columnX - 19, y: tongueTop + 12 },
-      arrowTo: { x: columnX - 3, y: tongueTop + 12 },
+      text: { x: columnRight + 31, y: tongueBottom - 9 },
+      arrowFrom: { x: columnRight + 19, y: tongueBottom - 12 },
+      arrowTo: { x: columnRight + 3, y: tongueBottom - 12 },
     },
     {
       label: "glue on\nback",
-      text: { x: columnRight + 31, y: tongueTop + 9 },
-      arrowFrom: { x: columnRight + 19, y: tongueTop + 12 },
-      arrowTo: { x: columnRight + 3, y: tongueTop + 12 },
+      text: { x: columnX - 31, y: tongueBottom - 9 },
+      arrowFrom: { x: columnX - 19, y: tongueBottom - 12 },
+      arrowTo: { x: columnX - 3, y: tongueBottom - 12 },
     },
   ],
   cutPaths: [
@@ -420,16 +421,16 @@ export const deckboxTemplate: BoxTemplate = {
     poly(rightHingeFlapPoints),
 
     // Main front column edges.
-    line({ x: columnX, y: lidTop }, { x: columnX, y: frontTop }),
-    line({ x: columnRight, y: lidTop }, { x: columnRight, y: frontTop }),
-    line({ x: columnX, y: frontTop }, { x: columnRight, y: frontTop }),
+    line({ x: columnRight, y: tongueTop }, { x: columnRight, y: bodyBottom }),
+    line({ x: columnX, y: tongueTop }, { x: columnX, y: bodyBottom }),
+    line({ x: columnRight, y: bodyBottom }, { x: columnX, y: bodyBottom }),
 
     // Left glue flap.
     poly([
-      { x: columnX, y: frontTop },
-      { x: glueX, y: frontTop },
-      { x: glueX, y: frontBottom },
-      { x: columnX, y: frontBottom },
+      { x: columnRight, y: bodyBottom },
+      { x: glueX + glueWidth, y: bodyBottom },
+      { x: glueX + glueWidth, y: bodyTop },
+      { x: columnRight, y: bodyTop },
     ]),
 
     // Right-hand body strip, including the deep V-shaped receiving cut above the slot panel.
@@ -442,22 +443,22 @@ export const deckboxTemplate: BoxTemplate = {
     poly(rightSideBottomFlapPoints),
   ],
   scorePaths: [
-    line({ x: columnX, y: lidTop }, { x: columnRight, y: lidTop }),
-    line({ x: columnX, y: midTop }, { x: columnRight, y: midTop }),
-    line({ x: columnX, y: frontTop }, { x: columnRight, y: frontTop }),
-    line({ x: glueX, y: frontBottom }, { x: rightOuter, y: frontBottom }),
-    line({ x: columnX, y: frontTop }, { x: columnX, y: frontBottom }),
-    line({ x: columnRight, y: frontTop }, { x: columnRight, y: frontBottom }),
-    line({ x: backX, y: frontTop }, { x: backX, y: frontBottom }),
-    line({ x: outerSideX, y: frontTop }, { x: outerSideX, y: frontBottom }),
+    line({ x: columnRight, y: tongueTop }, { x: columnX, y: tongueTop }),
+    line({ x: columnRight, y: lidTop }, { x: columnX, y: lidTop }),
+    line({ x: columnRight, y: bodyBottom }, { x: columnX, y: bodyBottom }),
+    line({ x: glueX + glueWidth, y: bodyTop }, { x: outerSideX, y: bodyTop }),
+    line({ x: columnRight, y: bodyBottom }, { x: columnRight, y: bodyTop }),
+    line({ x: columnX, y: bodyBottom }, { x: columnX, y: bodyTop }),
+    line({ x: rightSideX, y: bodyBottom }, { x: rightSideX, y: bodyTop }),
+    line({ x: frontX, y: bodyBottom }, { x: frontX, y: bodyTop }),
     line(vLeftShoulder, vApex),
     line(vApex, vRightShoulder),
-    line({ x: rightSideX, y: frontBottom }, { x: backX, y: frontBottom }),
-    line({ x: backX, y: frontBottom }, { x: outerSideX, y: frontBottom }),
-    line({ x: outerSideX, y: frontBottom }, { x: rightOuter, y: frontBottom }),
-    line({ x: rightSideX, y: frontTop }, { x: backX, y: frontTop }),
-    line({ x: backX, y: frontTop }, { x: outerSideX, y: frontTop }),
-    line({ x: outerSideX, y: frontTop }, { x: rightOuter, y: frontTop }),
+    line({ x: columnX, y: bodyTop }, { x: rightSideX, y: bodyTop }),
+    line({ x: rightSideX, y: bodyTop }, { x: frontX, y: bodyTop }),
+    line({ x: frontX, y: bodyTop }, { x: outerSideX, y: bodyTop }),
+    line({ x: columnX, y: bodyBottom }, { x: rightSideX, y: bodyBottom }),
+    line({ x: rightSideX, y: bodyBottom }, { x: frontX, y: bodyBottom }),
+    line({ x: frontX, y: bodyBottom }, { x: outerSideX, y: bodyBottom }),
   ],
   slotPaths: [
     poly(tongueSlotPoints, true),
