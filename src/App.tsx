@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ArtworkBySlot, ArtworkPlacement, ArtworkSlotId, ImageInfo } from "./types/artwork";
 import { BoxPreview } from "./components/BoxPreview";
 import { Controls } from "./components/Controls";
@@ -9,6 +9,23 @@ const initialPlacement: ArtworkPlacement = {
   panXmm: 0,
   panYmm: 0,
 };
+
+const TITLE_ADJECTIVES = [
+  "Dubious",
+  "Dazzling",
+  "Dope",
+  "Decent",
+  "Deluxe",
+  "Distinguished",
+  "Divine",
+  "Dynamic",
+  "Dastardly",
+  "Diabolical",
+  "Demure",
+  "Duplicitous",
+  "Dilapidated",
+  "Distinctive",
+];
 
 function createInitialArtwork(): ArtworkBySlot {
   return {
@@ -24,6 +41,15 @@ export default function App() {
   const [artwork, setArtwork] = useState<ArtworkBySlot>(createInitialArtwork);
   const [activeSlot, setActiveSlot] = useState<ArtworkSlotId>("front");
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+  const titleAdjective = useMemo(
+    () => TITLE_ADJECTIVES[Math.floor(Math.random() * TITLE_ADJECTIVES.length)],
+    [],
+  );
+  const appTitle = `Deb's ${titleAdjective} Deckbox Designer`;
+
+  useEffect(() => {
+    document.title = appTitle;
+  }, [appTitle]);
 
   async function handleImageChange(slot: ArtworkSlotId, file: File) {
     const url = URL.createObjectURL(file);
@@ -70,7 +96,7 @@ export default function App() {
     <main className="app-shell">
       <header className="app-header">
         <div>
-          <h1>Deb&apos;s Deckbox Creator</h1>
+          <h1>{appTitle}</h1>
         </div>
       </header>
 
