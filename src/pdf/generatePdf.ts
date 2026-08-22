@@ -1,8 +1,7 @@
-import { jsPDF } from "jspdf";
+import { GState, jsPDF } from "jspdf";
 import type { ArtworkBySlot, ImageInfo } from "../types/artwork";
 import type { ArtworkClip, ArtworkRegion, BoxTemplate, PathSegment, PointMm, RectMm } from "../types/box";
 import { getArtworkDrawRect } from "../image/effectiveDpi";
-import { targetMeasurements } from "../templates/deckbox/measurements";
 
 type PdfOptions = {
   artwork: ArtworkBySlot;
@@ -26,12 +25,7 @@ type PdfPathOp = {
   c: number[];
 };
 
-const inchToMm = 25.4;
-const fedexMinimumMarginMm = targetMeasurements.minimumMarginMm;
-const pdfPageCandidates: PdfPage[] = [
-  { name: "11 x 17 in", widthMm: 17 * inchToMm, heightMm: 11 * inchToMm },
-  { name: "12 x 18 in", widthMm: 18 * inchToMm, heightMm: 12 * inchToMm },
-];
+const pdfLineWidthMm = 0.25;
 
 export async function downloadDeckboxPdf(template: BoxTemplate, options: PdfOptions) {
   const pdf = await createDeckboxPdf(template, options);
@@ -50,7 +44,7 @@ export async function createDeckboxPdf(template: BoxTemplate, options: PdfOption
   fillPage(pdf, layout.page);
   drawBackgrounds(pdf, template, options.backgroundColor, layout.offset);
   await drawArtwork(pdf, template, options.artwork, layout.offset);
-  drawClipFills(pdf, template.knockoutRegions, "#ffffff", layout.offset, { overprintStroke: true });
+  drawClipFills(pdf, template.knockoutRegions, "#ffffff", layout.offset);
   drawClipFills(pdf, template.glueRegions, "#ffffff", layout.offset);
   drawGlueLabels(pdf, template, layout.offset);
   drawBackGlueAnnotations(pdf, template, layout.offset);
@@ -65,20 +59,13 @@ export function getDeckboxPdfLayout(template: BoxTemplate) {
 }
 
 function choosePdfLayout(template: BoxTemplate): PdfLayout {
-  const contentBounds = getTemplateContentBounds(template);
-  const page =
-    pdfPageCandidates.find(
-      (candidate) =>
-        contentBounds.width + fedexMinimumMarginMm * 2 <= candidate.widthMm &&
-        contentBounds.height + fedexMinimumMarginMm * 2 <= candidate.heightMm,
-    ) ?? pdfPageCandidates[pdfPageCandidates.length - 1];
-
   return {
-    page,
-    offset: {
-      x: (page.widthMm - template.pageWidthMm) / 2,
-      y: (page.heightMm - template.pageHeightMm) / 2,
+    page: {
+      name: "11 x 17 in",
+      widthMm: template.pageWidthMm,
+      heightMm: template.pageHeightMm,
     },
+    offset: { x: 0, y: 0 },
   };
 }
 
@@ -185,24 +172,14 @@ function drawClipFills(
   clips: ArtworkClip[],
   color: string,
   offset: PointMm,
-  options: { overprintStroke?: boolean } = {},
 ) {
   const { r, g, b } = parseHexColor(color);
   pdf.setFillColor(r, g, b);
-  pdf.setDrawColor(r, g, b);
-  if (options.overprintStroke) {
-    pdf.setLineWidth(0.8);
-  }
   pdf.setLineJoin("miter");
   clips.forEach((clip) => {
     const path = toPdfPathOps(clipToPathOps(clip), offset);
     pdf.path(path);
     pdf.fill();
-
-    if (options.overprintStroke) {
-      pdf.path(path);
-      pdf.stroke();
-    }
   });
 }
 
@@ -230,7 +207,7 @@ function drawBackGlueAnnotations(pdf: jsPDF, template: BoxTemplate, offset: Poin
   pdf.setTextColor(0, 0, 0);
   pdf.setDrawColor(0, 0, 0);
   pdf.setFillColor(0, 0, 0);
-  pdf.setLineWidth(0.45);
+  pdf.setLineWidth(pdfLineWidthMm);
 
   template.backGlueAnnotations.forEach((annotation) => {
     const from = addOffset(annotation.arrowFrom, offset);
@@ -246,18 +223,18 @@ function drawBackGlueAnnotations(pdf: jsPDF, template: BoxTemplate, offset: Poin
 }
 
 function drawScoreLines(pdf: jsPDF, template: BoxTemplate, offset: PointMm) {
-  pdf.setDrawColor(75, 85, 99);
-  pdf.setLineWidth(0.38);
-  pdf.setLineDashPattern([3, 2], 0);
+  pdf.saveGraphicsState();
+  pdf.setGState(new GState({ "stroke-opacity": 0.28 }));
+  pdf.setDrawColor(17, 24, 39);
+  pdf.setLineWidth(pdfLineWidthMm);
   drawPaths(pdf, template.scorePaths, offset);
-  pdf.setLineDashPattern([], 0);
+  pdf.restoreGraphicsState();
 }
 
 function drawCutLines(pdf: jsPDF, template: BoxTemplate, offset: PointMm) {
   pdf.setDrawColor(17, 24, 39);
-  pdf.setLineWidth(0.25);
+  pdf.setLineWidth(pdfLineWidthMm);
   drawPaths(pdf, template.cutPaths, offset);
-  pdf.setLineWidth(0.28);
   drawPaths(pdf, template.slotPaths, offset);
 }
 
@@ -394,17 +371,6 @@ function parsePathData(d: string): PdfPathOp[] {
   return ops;
 }
 
-function getTemplateContentBounds(template: BoxTemplate): RectMm {
-  const points = [
-    ...template.backgroundRegions.flatMap(getClipPoints),
-    ...template.cutPaths.flatMap(getPathPoints),
-    ...template.scorePaths.flatMap(getPathPoints),
-    ...template.slotPaths.flatMap(getPathPoints),
-  ];
-
-  return getPointsBounds(points);
-}
-
 function getClipBounds(clip: ArtworkClip): RectMm {
   if (clip.type === "rect") {
     return clip.rect;
@@ -429,18 +395,6 @@ function getClipPoints(clip: ArtworkClip): PointMm[] {
   }
 
   return getPathDataPoints(clip.d);
-}
-
-function getPathPoints(path: PathSegment): PointMm[] {
-  if (path.type === "line") {
-    return [path.from, path.to];
-  }
-
-  if (path.type === "polyline") {
-    return path.points;
-  }
-
-  return getPathDataPoints(path.d);
 }
 
 function getPathDataPoints(d: string): PointMm[] {

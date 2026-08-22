@@ -165,9 +165,8 @@ input:disabled {
 }
 
 .score-lines {
-  stroke: #8b95a1;
-  stroke-dasharray: 6 4;
-  stroke-width: 0.8;
+  stroke: rgba(17, 24, 39, 0.28);
+  stroke-width: 0.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

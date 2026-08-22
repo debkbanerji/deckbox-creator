@@ -7,7 +7,7 @@ const panelWidth = 74;
 const panelHeight = 100;
 const depth = 50;
 const rightSideWidth = depth;
-const glueWidth = 21;
+const glueWidth = 14;
 const leftDustWidth = 66;
 const tongueHeight = 28;
 const lidHeight = 67;
@@ -137,11 +137,12 @@ const bodyStripPoints: PointMm[] = [
   { x: outerSideX, y: bodyTop },
   { x: columnX, y: bodyTop },
 ];
+const bodyStripCutPoints = bodyStripPoints.slice(0, -1);
 const vCutoutPoints: PointMm[] = [vLeftShoulder, vRightShoulder, vApex];
 const backBottomFlapPoints: PointMm[] = [
   { x: columnRight, y: bodyTop },
   { x: columnX, y: bodyTop },
-  { x: columnX + 3, y: yTop },
+  { x: columnX, y: yTop },
   { x: columnX + 18, y: yTop },
   { x: columnX + 27, y: bodyTop - depth / 2 },
   { x: columnX + 37, y: bodyTop - depth / 2 },
@@ -159,7 +160,7 @@ const leftSideBottomFlapPoints: PointMm[] = [
 const frontBottomFlapPoints: PointMm[] = [
   { x: rightSideX, y: bodyTop },
   { x: frontX, y: bodyTop },
-  { x: frontX + 3, y: yTop },
+  { x: frontX, y: yTop },
   { x: frontX + 18, y: yTop },
   { x: frontX + 27, y: bodyTop - depth / 2 },
   { x: frontX + 37, y: bodyTop - depth / 2 },
@@ -180,6 +181,14 @@ const tongueSlotPoints: PointMm[] = [
   { x: frontX + 13, y: bodyTop + 34.1 },
   { x: frontX + 62, y: bodyTop + 34.1 },
 ];
+const tongueSlotCenter = {
+  x: (frontX + 13 + frontX + 62) / 2,
+  y: bodyTop + 35.7,
+};
+const tongueSlotKnockoutPoints = tongueSlotPoints.map((point) => ({
+  x: point.x + (point.x < tongueSlotCenter.x ? 0.14 : -0.14),
+  y: point.y + (point.y < tongueSlotCenter.y ? 0.18 : -0.18),
+}));
 
 const line = (from: PointMm, to: PointMm): PathSegment => ({
   type: "line",
@@ -192,6 +201,8 @@ const poly = (points: PointMm[], closed = false): PathSegment => ({
   points,
   closed,
 });
+
+const flapCut = (points: PointMm[]): PathSegment => poly(points.slice(1));
 
 const path = (d: string): PathSegment => ({
   type: "path",
@@ -227,6 +238,64 @@ const scalePolygon = (points: PointMm[], scale: number): PointMm[] => {
     x: center.x + (point.x - center.x) * scale,
     y: center.y + (point.y - center.y) * scale,
   }));
+};
+
+const rightHalfPolygon = (
+  points: PointMm[],
+  leftCutRatio = 0.5,
+  outerExtraLeftMm = 0,
+): PointMm[] => {
+  const source =
+    points.length > 1 &&
+    points[0].x === points[points.length - 1].x &&
+    points[0].y === points[points.length - 1].y
+      ? points.slice(0, -1)
+      : points;
+  const xs = source.map((point) => point.x);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const cutX = minX + (maxX - minX) * leftCutRatio;
+  const ys = source.map((point) => point.y);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const height = maxY - minY || 1;
+  const edgeTopX = cutX;
+  const edgeSlope = -outerExtraLeftMm / height;
+  const clipped: PointMm[] = [];
+  const edgeXAtY = (y: number) => edgeTopX + (y - minY) * edgeSlope;
+
+  const intersect = (from: PointMm, to: PointMm): PointMm => {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const denominator = dx - edgeSlope * dy;
+    const t =
+      Math.abs(denominator) < 0.0001
+        ? 0
+        : (edgeXAtY(from.y) - from.x) / denominator;
+    const y = from.y + dy * t;
+
+    return { x: edgeXAtY(y), y };
+  };
+
+  source.forEach((point, index) => {
+    const previous = source[(index + source.length - 1) % source.length];
+    const pointInside = point.x >= edgeXAtY(point.y);
+    const previousInside = previous.x >= edgeXAtY(previous.y);
+
+    if (pointInside && !previousInside) {
+      clipped.push(intersect(previous, point));
+    }
+
+    if (pointInside) {
+      clipped.push(point);
+    }
+
+    if (!pointInside && previousInside) {
+      clipped.push(intersect(previous, point));
+    }
+  });
+
+  return clipped;
 };
 
 const topProngCutD = `
@@ -385,15 +454,15 @@ export const deckboxTemplate: BoxTemplate = {
     polygonRegion(rightSideBottomFlapPoints),
   ],
   knockoutRegions: [
-    polygonRegion(vCutoutPoints),
-    polygonRegion(tongueSlotPoints),
+    polygonRegion(scalePolygon(vCutoutPoints, 0.994)),
+    polygonRegion(tongueSlotKnockoutPoints),
   ],
   glueRegions: [
     rectRegion(insetRect(glueFlapRect, 4, 10)),
     polygonRegion(scalePolygon(leftHingeFlapPoints, 0.58)),
     polygonRegion(scalePolygon(rightHingeFlapPoints, 0.58)),
-    polygonRegion(scalePolygon(leftSideBottomFlapPoints, 0.58)),
-    polygonRegion(scalePolygon(rightSideBottomFlapPoints, 0.58)),
+    polygonRegion(rightHalfPolygon(scalePolygon(leftSideBottomFlapPoints, 0.58), 0.36, 1.75)),
+    polygonRegion(rightHalfPolygon(scalePolygon(rightSideBottomFlapPoints, 0.58), 0.36, 1.75)),
   ],
   backGlueAnnotations: [
     {
@@ -420,11 +489,6 @@ export const deckboxTemplate: BoxTemplate = {
     poly(leftHingeFlapPoints),
     poly(rightHingeFlapPoints),
 
-    // Main front column edges.
-    line({ x: columnRight, y: tongueTop }, { x: columnRight, y: bodyBottom }),
-    line({ x: columnX, y: tongueTop }, { x: columnX, y: bodyBottom }),
-    line({ x: columnRight, y: bodyBottom }, { x: columnX, y: bodyBottom }),
-
     // Left glue flap.
     poly([
       { x: columnRight, y: bodyBottom },
@@ -434,25 +498,23 @@ export const deckboxTemplate: BoxTemplate = {
     ]),
 
     // Right-hand body strip, including the deep V-shaped receiving cut above the slot panel.
-    poly(bodyStripPoints),
+    poly(bodyStripCutPoints),
 
     // Bottom flaps are deliberately varied so the locking flaps slot together cleanly.
-    poly(backBottomFlapPoints),
-    poly(leftSideBottomFlapPoints),
-    poly(frontBottomFlapPoints),
-    poly(rightSideBottomFlapPoints),
+    flapCut(backBottomFlapPoints),
+    flapCut(leftSideBottomFlapPoints),
+    flapCut(frontBottomFlapPoints),
+    flapCut(rightSideBottomFlapPoints),
   ],
   scorePaths: [
     line({ x: columnRight, y: tongueTop }, { x: columnX, y: tongueTop }),
     line({ x: columnRight, y: lidTop }, { x: columnX, y: lidTop }),
     line({ x: columnRight, y: bodyBottom }, { x: columnX, y: bodyBottom }),
     line({ x: glueX + glueWidth, y: bodyTop }, { x: outerSideX, y: bodyTop }),
-    line({ x: columnRight, y: bodyBottom }, { x: columnRight, y: bodyTop }),
-    line({ x: columnX, y: bodyBottom }, { x: columnX, y: bodyTop }),
+    line({ x: columnRight, y: tongueTop }, { x: columnRight, y: bodyTop }),
+    line({ x: columnX, y: tongueTop }, { x: columnX, y: bodyTop }),
     line({ x: rightSideX, y: bodyBottom }, { x: rightSideX, y: bodyTop }),
     line({ x: frontX, y: bodyBottom }, { x: frontX, y: bodyTop }),
-    line(vLeftShoulder, vApex),
-    line(vApex, vRightShoulder),
     line({ x: columnX, y: bodyTop }, { x: rightSideX, y: bodyTop }),
     line({ x: rightSideX, y: bodyTop }, { x: frontX, y: bodyTop }),
     line({ x: frontX, y: bodyTop }, { x: outerSideX, y: bodyTop }),

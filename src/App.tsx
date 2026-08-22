@@ -49,8 +49,8 @@ export default function App() {
   const appTitle = `Deb's ${titleAdjective} Deckbox Designer`;
 
   useEffect(() => {
-    document.title = appTitle;
-  }, [appTitle]);
+    document.title = "Deckbox Designer";
+  }, []);
 
   async function handleImageChange(slot: ArtworkSlotId, file: File) {
     const url = URL.createObjectURL(file);
