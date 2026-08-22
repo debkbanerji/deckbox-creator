@@ -9,8 +9,9 @@ const depth = 50;
 const rightSideWidth = depth;
 const glueWidth = 14;
 const leftDustWidth = 66;
-const tongueHeight = 28;
-const lidHeight = 67;
+const frontCoverHeightIncrease = 13;
+const tongueHeight = 28 - frontCoverHeightIncrease;
+const lidHeight = 67 + frontCoverHeightIncrease;
 const midPanelHeight = depth;
 const bottomFlap = 34;
 
@@ -35,8 +36,8 @@ const tongueBottom = tongueTop + tongueHeight;
 
 const frontCenterX = frontX + panelWidth / 2;
 const vApex = { x: frontCenterX, y: bodyTop + panelHeight - 53 };
-const vLeftShoulder = { x: frontCenterX + 66, y: bodyBottom };
-const vRightShoulder = { x: frontCenterX - 66, y: bodyBottom };
+const vLeftShoulder = { x: columnX, y: bodyBottom };
+const vRightShoulder = { x: outerSideX, y: bodyBottom };
 const lidWingWidth = depth;
 
 const backPanel: RectMm = {
@@ -77,15 +78,11 @@ const outerSidePanel: RectMm = {
 };
 const leftCoverWingPoints: PointMm[] = [
   { x: columnRight, y: tongueTop },
-  { x: columnRight + 12, y: tongueTop },
-  { x: columnRight + lidWingWidth, y: lidTop + 9 },
   { x: columnRight + lidWingWidth, y: lidTop },
   { x: columnRight, y: lidTop },
 ];
 const rightCoverWingPoints: PointMm[] = [
   { x: columnX, y: tongueTop },
-  { x: columnX - 12, y: tongueTop },
-  { x: columnX - lidWingWidth, y: lidTop + 9 },
   { x: columnX - lidWingWidth, y: lidTop },
   { x: columnX, y: lidTop },
 ];
@@ -118,14 +115,14 @@ const rightCoverWingArtworkRect: RectMm = {
 const glueFlapRect: RectMm = { x: glueX, y: bodyTop, width: glueWidth, height: panelHeight };
 const leftHingeFlapPoints: PointMm[] = [
   { x: columnRight, y: lidTop },
-  { x: columnRight + 38, y: topPanelTop + 23 },
-  { x: columnRight + 32, y: topPanelTop + 14 },
+  { x: columnRight + 17, y: topPanelTop + 37 },
+  { x: columnRight + 15, y: topPanelTop + 14 },
   { x: columnRight, y: topPanelTop },
 ];
 const rightHingeFlapPoints: PointMm[] = [
   { x: columnX, y: lidTop },
-  { x: columnX - 38, y: topPanelTop + 23 },
-  { x: columnX - 32, y: topPanelTop + 14 },
+  { x: columnX - 17, y: topPanelTop + 37 },
+  { x: columnX - 15, y: topPanelTop + 14 },
   { x: columnX, y: topPanelTop },
 ];
 const bodyStripPoints: PointMm[] = [
@@ -176,14 +173,14 @@ const rightSideBottomFlapPoints: PointMm[] = [
   { x: frontX, y: bodyTop },
 ];
 const tongueSlotPoints: PointMm[] = [
-  { x: frontX + 58, y: bodyTop + 37.3 },
-  { x: frontX + 17, y: bodyTop + 37.3 },
-  { x: frontX + 13, y: bodyTop + 34.1 },
-  { x: frontX + 62, y: bodyTop + 34.1 },
+  { x: frontX + 58, y: bodyTop + 38.3 - frontCoverHeightIncrease },
+  { x: frontX + 17, y: bodyTop + 38.3 - frontCoverHeightIncrease },
+  { x: frontX + 13, y: bodyTop + 35.1 - frontCoverHeightIncrease },
+  { x: frontX + 62, y: bodyTop + 35.1 - frontCoverHeightIncrease },
 ];
 const tongueSlotCenter = {
   x: (frontX + 13 + frontX + 62) / 2,
-  y: bodyTop + 35.7,
+  y: bodyTop + 36.7 - frontCoverHeightIncrease,
 };
 const tongueSlotKnockoutPoints = tongueSlotPoints.map((point) => ({
   x: point.x + (point.x < tongueSlotCenter.x ? 0.14 : -0.14),
@@ -302,15 +299,13 @@ const topProngCutD = `
   M ${columnRight} ${tongueTop}
   L ${columnRight} ${tongueBottom - 5.6}
   C ${columnRight} ${tongueBottom - 2.4}, ${columnRight - 2.4} ${tongueBottom}, ${columnRight - 5.6} ${tongueBottom}
-  L ${columnRight - 17.3} ${tongueBottom}
-  C ${columnRight - 20} ${tongueBottom}, ${columnRight - 21.6} ${tongueBottom - 1.8}, ${columnRight - 21.6} ${tongueBottom - 4.6}
-  L ${columnRight - 21.6} ${tongueTop + 11.8}
-  C ${columnRight - 21.6} ${tongueTop + 8.2}, ${columnRight - 24.5} ${tongueTop + 6.1}, ${columnRight - 28.1} ${tongueTop + 6.1}
+  L ${columnRight - 17.8} ${tongueBottom}
+  C ${columnRight - 21.2} ${tongueBottom}, ${columnRight - 22.6} ${tongueBottom - 1.6}, ${columnRight - 22.6} ${tongueBottom - 5.2}
+  C ${columnRight - 22.6} ${tongueTop + 7.4}, ${columnRight - 24.5} ${tongueTop + 6.1}, ${columnRight - 28.1} ${tongueTop + 6.1}
   C ${columnRight - 31.5} ${tongueTop + 6.1}, ${columnRight - 32.2} ${tongueTop + 9.6}, ${columnRight - 37.5} ${tongueTop + 9.6}
   C ${columnRight - 42.8} ${tongueTop + 9.6}, ${columnRight - 43.5} ${tongueTop + 6.1}, ${columnRight - 46.9} ${tongueTop + 6.1}
-  C ${columnRight - 50.5} ${tongueTop + 6.1}, ${columnRight - 53.4} ${tongueTop + 8.2}, ${columnRight - 53.4} ${tongueTop + 11.8}
-  L ${columnRight - 53.4} ${tongueBottom - 4.6}
-  C ${columnRight - 53.4} ${tongueBottom - 1.8}, ${columnRight - 55} ${tongueBottom}, ${columnRight - 57.7} ${tongueBottom}
+  C ${columnRight - 50.5} ${tongueTop + 6.1}, ${columnRight - 52.4} ${tongueTop + 7.4}, ${columnRight - 52.4} ${tongueBottom - 5.2}
+  C ${columnRight - 52.4} ${tongueBottom - 1.6}, ${columnRight - 54.3} ${tongueBottom}, ${columnRight - 57.7} ${tongueBottom}
   L ${columnRight - 69.4} ${tongueBottom}
   C ${columnRight - 72.6} ${tongueBottom}, ${columnX} ${tongueBottom - 2.4}, ${columnX} ${tongueBottom - 5.6}
   L ${columnX} ${tongueTop}
