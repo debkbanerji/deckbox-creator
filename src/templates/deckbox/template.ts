@@ -398,13 +398,13 @@ export const deckboxTemplate: BoxTemplate = {
   backGlueAnnotations: [
     {
       label: "glue on\nback",
-      text: { x: columnRight + 31, y: tongueBottom - 9 },
+      text: { x: columnRight + 31, y: tongueBottom - 14.5 },
       arrowFrom: { x: columnRight + 19, y: tongueBottom - 12 },
       arrowTo: { x: columnRight + 3, y: tongueBottom - 12 },
     },
     {
       label: "glue on\nback",
-      text: { x: columnX - 31, y: tongueBottom - 9 },
+      text: { x: columnX - 31, y: tongueBottom - 14.5 },
       arrowFrom: { x: columnX - 19, y: tongueBottom - 12 },
       arrowTo: { x: columnX - 3, y: tongueBottom - 12 },
     },

@@ -41,6 +41,7 @@ export default function App() {
   const [artwork, setArtwork] = useState<ArtworkBySlot>(createInitialArtwork);
   const [activeSlot, setActiveSlot] = useState<ArtworkSlotId>("front");
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+  const [isExporting, setIsExporting] = useState(false);
   const titleAdjective = useMemo(
     () => TITLE_ADJECTIVES[Math.floor(Math.random() * TITLE_ADJECTIVES.length)],
     [],
@@ -92,6 +93,23 @@ export default function App() {
     });
   }
 
+  async function handleExport() {
+    setIsExporting(true);
+
+    try {
+      const { downloadDeckboxPdf } = await import("./pdf/generatePdf");
+      await downloadDeckboxPdf(deckboxTemplate, {
+        artwork,
+        backgroundColor,
+      });
+    } catch (error) {
+      console.error(error);
+      window.alert("Unable to export the PDF.");
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -129,6 +147,7 @@ export default function App() {
           onBackgroundColorChange={setBackgroundColor}
           onImageChange={handleImageChange}
           onImageClear={handleImageClear}
+          onExport={handleExport}
           onZoomChange={(slot, scale) =>
             setArtwork((current) => ({
               ...current,
@@ -141,6 +160,7 @@ export default function App() {
               },
             }))
           }
+          isExporting={isExporting}
         />
       </div>
     </main>

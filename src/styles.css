@@ -322,6 +322,25 @@ input:disabled {
   cursor: pointer;
 }
 
+.export-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid #0f766e;
+  border-radius: 7px;
+  background: #0f766e;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.export-button:hover:not(:disabled) {
+  background: #115e59;
+  border-color: #115e59;
+}
+
 .control-row {
   display: flex;
   align-items: center;
@@ -335,6 +354,11 @@ input[type="range"] {
   width: 100%;
   accent-color: #0f766e;
   cursor: pointer;
+}
+
+.export-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .upload-control:hover,

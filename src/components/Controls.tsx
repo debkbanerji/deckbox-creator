@@ -1,12 +1,14 @@
-import { FiUpload, FiX } from "react-icons/fi";
+import { FiDownload, FiUpload, FiX } from "react-icons/fi";
 import type { ArtworkBySlot, ArtworkSlotId } from "../types/artwork";
 
 type Props = {
   artwork: ArtworkBySlot;
   activeSlot: ArtworkSlotId;
   backgroundColor: string;
+  isExporting: boolean;
   onActiveSlotChange: (slot: ArtworkSlotId) => void;
   onBackgroundColorChange: (color: string) => void;
+  onExport: () => void;
   onImageChange: (slot: ArtworkSlotId, file: File) => void;
   onImageClear: (slot: ArtworkSlotId) => void;
   onZoomChange: (slot: ArtworkSlotId, zoom: number) => void;
@@ -24,8 +26,10 @@ export function Controls({
   artwork,
   activeSlot,
   backgroundColor,
+  isExporting,
   onActiveSlotChange,
   onBackgroundColorChange,
+  onExport,
   onImageChange,
   onImageClear,
   onZoomChange,
@@ -108,6 +112,10 @@ export function Controls({
         />
       </div>
 
+      <button className="export-button" type="button" onClick={onExport} disabled={isExporting}>
+        <FiDownload aria-hidden />
+        {isExporting ? "Downloading PDF" : "Download PDF"}
+      </button>
     </aside>
   );
 }
