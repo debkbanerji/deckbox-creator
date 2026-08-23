@@ -1,5 +1,7 @@
 import type { ArtworkClip, BoxTemplate, PathSegment, PointMm, RectMm } from "../../types/box";
 
+export type DeckboxSealingMode = "tongue" | "magnets";
+
 const pageWidthMm = 431.8;
 const pageHeightMm = 279.4;
 
@@ -136,6 +138,35 @@ const bodyStripPoints: PointMm[] = [
 ];
 const bodyStripCutPoints = bodyStripPoints.slice(0, -1);
 const vCutoutPoints: PointMm[] = [vLeftShoulder, vRightShoulder, vApex];
+const frontMagnetTab = {
+  x: vApex.x - 17,
+  y: vApex.y - 12,
+  width: 34,
+  height: tongueHeight,
+  radius: 4.5,
+};
+const frontMagnetTabLeftTop = { x: frontMagnetTab.x, y: frontMagnetTab.y };
+const frontMagnetTabRightTop = {
+  x: frontMagnetTab.x + frontMagnetTab.width,
+  y: frontMagnetTab.y,
+};
+const frontMagnetTabLeftBottom = {
+  x: frontMagnetTab.x,
+  y: frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius,
+};
+const frontMagnetTabRightBottom = {
+  x: frontMagnetTab.x + frontMagnetTab.width,
+  y: frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius,
+};
+const frontMagnetCircleCenter = {
+  x: frontMagnetTab.x + frontMagnetTab.width / 2,
+  y: frontMagnetTab.y + frontMagnetTab.height / 2,
+};
+const topMagnetCircleCenter = {
+  x: columnX + panelWidth / 2,
+  y: tongueTop + tongueHeight / 2,
+};
+const magnetCircleRadius = 3;
 const backBottomFlapPoints: PointMm[] = [
   { x: columnRight, y: bodyTop },
   { x: columnX, y: bodyTop },
@@ -205,6 +236,52 @@ const path = (d: string): PathSegment => ({
   type: "path",
   d,
 });
+
+const bottomRoundedRectPath = (rect: RectMm, radius: number): string => {
+  const right = rect.x + rect.width;
+  const bottom = rect.y + rect.height;
+  const leftControlX = rect.x + radius * 0.45;
+  const rightControlX = right - radius * 0.45;
+
+  return `
+    M ${rect.x} ${rect.y}
+    L ${right} ${rect.y}
+    L ${right} ${bottom - radius}
+    C ${right} ${bottom - radius * 0.45}, ${rightControlX} ${bottom}, ${right - radius} ${bottom}
+    L ${rect.x + radius} ${bottom}
+    C ${leftControlX} ${bottom}, ${rect.x} ${bottom - radius * 0.45}, ${rect.x} ${bottom - radius}
+    L ${rect.x} ${rect.y}
+  `;
+};
+
+const bottomRoundedRectCutPath = (rect: RectMm, radius: number): string => {
+  const right = rect.x + rect.width;
+  const bottom = rect.y + rect.height;
+  const leftControlX = rect.x + radius * 0.45;
+  const rightControlX = right - radius * 0.45;
+
+  return `
+    M ${right} ${rect.y}
+    L ${right} ${bottom - radius}
+    C ${right} ${bottom - radius * 0.45}, ${rightControlX} ${bottom}, ${right - radius} ${bottom}
+    L ${rect.x + radius} ${bottom}
+    C ${leftControlX} ${bottom}, ${rect.x} ${bottom - radius * 0.45}, ${rect.x} ${bottom - radius}
+    L ${rect.x} ${rect.y}
+  `;
+};
+
+const circlePath = (center: PointMm, radius: number): string => {
+  const kappa = radius * 0.5522847498;
+
+  return `
+    M ${center.x + radius} ${center.y}
+    C ${center.x + radius} ${center.y + kappa}, ${center.x + kappa} ${center.y + radius}, ${center.x} ${center.y + radius}
+    C ${center.x - kappa} ${center.y + radius}, ${center.x - radius} ${center.y + kappa}, ${center.x - radius} ${center.y}
+    C ${center.x - radius} ${center.y - kappa}, ${center.x - kappa} ${center.y - radius}, ${center.x} ${center.y - radius}
+    C ${center.x + kappa} ${center.y - radius}, ${center.x + radius} ${center.y - kappa}, ${center.x + radius} ${center.y}
+    Z
+  `;
+};
 
 const rectRegion = (rect: RectMm): ArtworkClip => ({
   type: "rect",
@@ -314,12 +391,72 @@ const topProngCutD = `
 const topProngFillD = `${topProngCutD} Z`;
 const topProngCut = path(topProngCutD);
 
-export const deckboxTemplate: BoxTemplate = {
-  id: "deckbox",
-  name: "Deckbox",
-  pageWidthMm,
-  pageHeightMm,
-  frontPanel,
+const topMagnetTabD = bottomRoundedRectPath(
+  { x: columnX, y: tongueTop, width: panelWidth, height: tongueHeight },
+  4.4,
+);
+const topMagnetTabCutD = bottomRoundedRectCutPath(
+  { x: columnX, y: tongueTop, width: panelWidth, height: tongueHeight },
+  4.4,
+);
+const frontMagnetTabD = bottomRoundedRectPath(frontMagnetTab, frontMagnetTab.radius);
+const magnetBodyStripD = `
+  M ${columnX} ${bodyBottom}
+  L ${vLeftShoulder.x} ${vLeftShoulder.y}
+  L ${frontMagnetTabRightTop.x} ${frontMagnetTabRightTop.y}
+  L ${frontMagnetTab.x + frontMagnetTab.width} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius}
+  C ${frontMagnetTab.x + frontMagnetTab.width} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius * 0.45}, ${frontMagnetTab.x + frontMagnetTab.width - frontMagnetTab.radius * 0.45} ${frontMagnetTab.y + frontMagnetTab.height}, ${frontMagnetTab.x + frontMagnetTab.width - frontMagnetTab.radius} ${frontMagnetTab.y + frontMagnetTab.height}
+  L ${frontMagnetTab.x + frontMagnetTab.radius} ${frontMagnetTab.y + frontMagnetTab.height}
+  C ${frontMagnetTab.x + frontMagnetTab.radius * 0.45} ${frontMagnetTab.y + frontMagnetTab.height}, ${frontMagnetTab.x} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius * 0.45}, ${frontMagnetTab.x} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius}
+  L ${frontMagnetTabLeftTop.x} ${frontMagnetTabLeftTop.y}
+  L ${vRightShoulder.x} ${vRightShoulder.y}
+  L ${outerSideX} ${bodyBottom}
+  L ${outerSideX} ${bodyTop}
+  L ${columnX} ${bodyTop}
+  Z
+`;
+const magnetBodyStripCutD = `
+  M ${columnX} ${bodyBottom}
+  L ${frontMagnetTabRightTop.x} ${frontMagnetTabRightTop.y}
+  L ${frontMagnetTab.x + frontMagnetTab.width} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius}
+  C ${frontMagnetTab.x + frontMagnetTab.width} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius * 0.45}, ${frontMagnetTab.x + frontMagnetTab.width - frontMagnetTab.radius * 0.45} ${frontMagnetTab.y + frontMagnetTab.height}, ${frontMagnetTab.x + frontMagnetTab.width - frontMagnetTab.radius} ${frontMagnetTab.y + frontMagnetTab.height}
+  L ${frontMagnetTab.x + frontMagnetTab.radius} ${frontMagnetTab.y + frontMagnetTab.height}
+  C ${frontMagnetTab.x + frontMagnetTab.radius * 0.45} ${frontMagnetTab.y + frontMagnetTab.height}, ${frontMagnetTab.x} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius * 0.45}, ${frontMagnetTab.x} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius}
+  L ${frontMagnetTabLeftTop.x} ${frontMagnetTabLeftTop.y}
+  L ${outerSideX} ${bodyBottom}
+  L ${outerSideX} ${bodyTop}
+`;
+const magnetVoidKnockouts: ArtworkClip[] = [
+  polygonRegion([
+    vLeftShoulder,
+    frontMagnetTabRightTop,
+    frontMagnetTabRightBottom,
+  ]),
+  polygonRegion([
+    frontMagnetTabLeftTop,
+    vRightShoulder,
+    frontMagnetTabLeftBottom,
+  ]),
+];
+const magnetGuidePaths = [
+  path(circlePath(topMagnetCircleCenter, magnetCircleRadius)),
+  path(circlePath(frontMagnetCircleCenter, magnetCircleRadius)),
+];
+
+export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"): BoxTemplate => {
+  const isMagnetMode = sealingMode === "magnets";
+  const closureTabD = isMagnetMode ? topMagnetTabD : topProngFillD;
+  const closureCut = isMagnetMode ? path(topMagnetTabCutD) : topProngCut;
+  const bodyStripRegion = isMagnetMode ? { type: "path" as const, d: magnetBodyStripD } : polygonRegion(bodyStripPoints);
+  const bodyStripCut = isMagnetMode ? path(magnetBodyStripCutD) : poly(bodyStripCutPoints);
+
+  return {
+    id: isMagnetMode ? "deckbox-magnets" : "deckbox",
+    name: "Deckbox",
+    sealingMode,
+    pageWidthMm,
+    pageHeightMm,
+    frontPanel,
   panels: [
     {
       id: "lid",
@@ -379,9 +516,9 @@ export const deckboxTemplate: BoxTemplate = {
       renderRect: frontCoverRenderRect,
     },
     {
-      id: "front-cover-tongue",
+      id: isMagnetMode ? "front-cover-magnet-tab" : "front-cover-tongue",
       slot: "front",
-      clip: { type: "path", d: topProngFillD },
+      clip: { type: "path", d: closureTabD },
       anchorRect: frontPanel,
       renderRect: frontCoverRenderRect,
     },
@@ -433,7 +570,7 @@ export const deckboxTemplate: BoxTemplate = {
     },
   ],
   backgroundRegions: [
-    { type: "path", d: topProngFillD },
+    { type: "path", d: closureTabD },
     rectRegion(frontCoverPanel),
     polygonRegion(leftCoverWingPoints),
     polygonRegion(rightCoverWingPoints),
@@ -442,16 +579,18 @@ export const deckboxTemplate: BoxTemplate = {
     polygonRegion(rightHingeFlapPoints),
     rectRegion(backPanel),
     rectRegion(glueFlapRect),
-    polygonRegion(bodyStripPoints),
+    bodyStripRegion,
     polygonRegion(backBottomFlapPoints),
     polygonRegion(leftSideBottomFlapPoints),
     polygonRegion(frontBottomFlapPoints),
     polygonRegion(rightSideBottomFlapPoints),
   ],
-  knockoutRegions: [
-    polygonRegion(scalePolygon(vCutoutPoints, 0.994)),
-    polygonRegion(tongueSlotKnockoutPoints),
-  ],
+  knockoutRegions: isMagnetMode
+    ? magnetVoidKnockouts
+    : [
+        polygonRegion(scalePolygon(vCutoutPoints, 0.994)),
+        polygonRegion(tongueSlotKnockoutPoints),
+      ],
   glueRegions: [
     rectRegion(insetRect(glueFlapRect, 4, 10)),
     polygonRegion(scalePolygon(leftHingeFlapPoints, 0.58)),
@@ -462,19 +601,38 @@ export const deckboxTemplate: BoxTemplate = {
   backGlueAnnotations: [
     {
       label: "glue on\nback",
-      text: { x: columnRight + 31, y: tongueBottom - 14.5 },
-      arrowFrom: { x: columnRight + 19, y: tongueBottom - 12 },
-      arrowTo: { x: columnRight + 3, y: tongueBottom - 12 },
+      text: { x: columnRight + 31, y: tongueBottom - 10.5 },
+      arrowFrom: { x: columnRight + 19, y: tongueBottom - 8 },
+      arrowTo: { x: columnRight + 3, y: tongueBottom - 8 },
     },
     {
       label: "glue on\nback",
-      text: { x: columnX - 31, y: tongueBottom - 14.5 },
-      arrowFrom: { x: columnX - 19, y: tongueBottom - 12 },
-      arrowTo: { x: columnX - 3, y: tongueBottom - 12 },
+      text: { x: columnX - 31, y: tongueBottom - 10.5 },
+      arrowFrom: { x: columnX - 19, y: tongueBottom - 8 },
+      arrowTo: { x: columnX - 3, y: tongueBottom - 8 },
     },
+    ...(isMagnetMode
+      ? [
+          {
+            label: "glue on\nback",
+            text: {
+              x: frontMagnetCircleCenter.x,
+              y: frontMagnetTab.y + frontMagnetTab.height + 20,
+            },
+            arrowFrom: {
+              x: frontMagnetCircleCenter.x,
+              y: frontMagnetTab.y + frontMagnetTab.height + 12,
+            },
+            arrowTo: {
+              x: frontMagnetCircleCenter.x,
+              y: frontMagnetTab.y + frontMagnetTab.height + 3,
+            },
+          },
+        ]
+      : []),
   ],
   cutPaths: [
-    topProngCut,
+    closureCut,
 
     // Lid dust flaps, wide and angled to match the current deckbox geometry.
     poly(leftCoverWingPoints),
@@ -493,7 +651,7 @@ export const deckboxTemplate: BoxTemplate = {
     ]),
 
     // Right-hand body strip, including the deep V-shaped receiving cut above the slot panel.
-    poly(bodyStripCutPoints),
+    bodyStripCut,
 
     // Bottom flaps are deliberately varied so the locking flaps slot together cleanly.
     flapCut(backBottomFlapPoints),
@@ -503,6 +661,7 @@ export const deckboxTemplate: BoxTemplate = {
   ],
   scorePaths: [
     line({ x: columnRight, y: tongueTop }, { x: columnX, y: tongueTop }),
+    ...(isMagnetMode ? [line(frontMagnetTabLeftTop, frontMagnetTabRightTop)] : []),
     line({ x: columnRight, y: lidTop }, { x: columnX, y: lidTop }),
     line({ x: columnRight, y: bodyBottom }, { x: columnX, y: bodyBottom }),
     line({ x: glueX + glueWidth, y: bodyTop }, { x: outerSideX, y: bodyTop }),
@@ -517,7 +676,11 @@ export const deckboxTemplate: BoxTemplate = {
     line({ x: rightSideX, y: bodyBottom }, { x: frontX, y: bodyBottom }),
     line({ x: frontX, y: bodyBottom }, { x: outerSideX, y: bodyBottom }),
   ],
-  slotPaths: [
+  slotPaths: isMagnetMode ? [] : [
     poly(tongueSlotPoints, true),
   ],
+  magnetPaths: isMagnetMode ? magnetGuidePaths : [],
+  };
 };
+
+export const deckboxTemplate = createDeckboxTemplate();

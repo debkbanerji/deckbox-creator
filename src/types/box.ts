@@ -41,6 +41,7 @@ export type ArrowAnnotation = {
 export type BoxTemplate = {
   id: string;
   name: string;
+  sealingMode?: "tongue" | "magnets";
   pageWidthMm: number;
   pageHeightMm: number;
   panels: Array<{
@@ -51,6 +52,7 @@ export type BoxTemplate = {
   cutPaths: PathSegment[];
   scorePaths: PathSegment[];
   slotPaths: PathSegment[];
+  magnetPaths?: PathSegment[];
   backgroundRegions: ArtworkClip[];
   knockoutRegions: ArtworkClip[];
   glueRegions: ArtworkClip[];

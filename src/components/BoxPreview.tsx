@@ -1,6 +1,12 @@
 import { useId, useRef } from "react";
 import type { ArtworkBySlot, ArtworkSlotId } from "../types/artwork";
-import type { ArtworkClip, ArtworkRegion, BoxTemplate, PathSegment, PointMm } from "../types/box";
+import type {
+  ArtworkClip,
+  ArtworkRegion,
+  BoxTemplate,
+  PathSegment,
+  PointMm,
+} from "../types/box";
 import { getArtworkDrawRect } from "../image/effectiveDpi";
 
 type Props = {
@@ -28,8 +34,6 @@ export function BoxPreview({
     point: PointMm;
     rotationDegrees: ArtworkRegion["rotationDegrees"];
   } | null>(null);
-  const dimensionPanel =
-    template.panels.find((panel) => panel.label === "BACK")?.rect ?? template.frontPanel;
 
   function getSvgPoint(event: React.PointerEvent<SVGElement>) {
     const svg = svgRef.current;
@@ -101,7 +105,7 @@ export function BoxPreview({
             <text
               key={panel.id}
               x={panel.rect.x + panel.rect.width / 2}
-              y={panel.id === "back" ? panel.rect.y + 78 : panel.rect.y + panel.rect.height / 2}
+              y={getPanelLabelY(template, panel.id, panel.rect.y, panel.rect.height)}
               transform={
                 panel.id === "glue"
                   ? `rotate(-90 ${panel.rect.x + panel.rect.width / 2} ${
@@ -113,23 +117,6 @@ export function BoxPreview({
               {panel.label}
             </text>
           ))}
-          <text
-            className="dimension-label"
-            x={dimensionPanel.x + dimensionPanel.width / 2}
-            y={dimensionPanel.y + 8}
-          >
-            {dimensionPanel.width} mm
-          </text>
-          <text
-            className="dimension-label"
-            x={dimensionPanel.x + 8}
-            y={dimensionPanel.y + dimensionPanel.height / 2}
-            transform={`rotate(-90 ${dimensionPanel.x + 8} ${
-              dimensionPanel.y + dimensionPanel.height / 2
-            })`}
-          >
-            {dimensionPanel.height} mm
-          </text>
         </g>
 
         <g className="artwork-regions">
@@ -189,6 +176,9 @@ export function BoxPreview({
         <g className="score-lines">{template.scorePaths.map((path, index) => renderPath(path, index))}</g>
         <g className="cut-lines">{template.cutPaths.map((path, index) => renderPath(path, index))}</g>
         <g className="slot-lines">{template.slotPaths.map((path, index) => renderPath(path, index))}</g>
+        <g className="magnet-guides">
+          {template.magnetPaths?.map((path, index) => renderPath(path, index))}
+        </g>
 
         <g className="artwork-hit-regions">
           {template.artworkRegions.map((region) => (
@@ -281,6 +271,14 @@ function renderArtworkRegion(region: ArtworkRegion, artwork: ArtworkBySlot, clip
       />
     </g>
   );
+}
+
+function getPanelLabelY(template: BoxTemplate, panelId: string, y: number, height: number) {
+  if (panelId === "back") {
+    return template.sealingMode === "magnets" ? y + 30 : y + 78;
+  }
+
+  return y + height / 2;
 }
 
 function renderClip(clip: ArtworkClip, attributes: { fill?: string } = {}) {

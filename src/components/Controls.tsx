@@ -1,13 +1,16 @@
 import { FiDownload, FiUpload, FiX } from "react-icons/fi";
 import type { ArtworkBySlot, ArtworkSlotId } from "../types/artwork";
+import type { DeckboxSealingMode } from "../templates/deckbox/template";
 
 type Props = {
   artwork: ArtworkBySlot;
   activeSlot: ArtworkSlotId;
   backgroundColor: string;
+  sealingMode: DeckboxSealingMode;
   isExporting: boolean;
   onActiveSlotChange: (slot: ArtworkSlotId) => void;
   onBackgroundColorChange: (color: string) => void;
+  onSealingModeChange: (mode: DeckboxSealingMode) => void;
   onExport: () => void;
   onImageChange: (slot: ArtworkSlotId, file: File) => void;
   onImageClear: (slot: ArtworkSlotId) => void;
@@ -26,9 +29,11 @@ export function Controls({
   artwork,
   activeSlot,
   backgroundColor,
+  sealingMode,
   isExporting,
   onActiveSlotChange,
   onBackgroundColorChange,
+  onSealingModeChange,
   onExport,
   onImageChange,
   onImageClear,
@@ -110,6 +115,29 @@ export function Controls({
           value={backgroundColor}
           onChange={(event) => onBackgroundColorChange(event.target.value)}
         />
+      </div>
+
+      <div className="mode-control" aria-label="Closure mode">
+        <div className="control-row">
+          <span>Closure</span>
+          <span>{sealingMode === "tongue" ? "Insert" : "Magnet"}</span>
+        </div>
+        <div className="segmented-control">
+          <button
+            type="button"
+            className={sealingMode === "tongue" ? "is-active" : undefined}
+            onClick={() => onSealingModeChange("tongue")}
+          >
+            Insert
+          </button>
+          <button
+            type="button"
+            className={sealingMode === "magnets" ? "is-active" : undefined}
+            onClick={() => onSealingModeChange("magnets")}
+          >
+            Magnet
+          </button>
+        </div>
       </div>
 
       <button className="export-button" type="button" onClick={onExport} disabled={isExporting}>

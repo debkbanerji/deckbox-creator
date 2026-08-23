@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ArtworkBySlot, ArtworkPlacement, ArtworkSlotId, ImageInfo } from "./types/artwork";
 import { BoxPreview } from "./components/BoxPreview";
 import { Controls } from "./components/Controls";
-import { deckboxTemplate } from "./templates/deckbox/template";
+import { createDeckboxTemplate, type DeckboxSealingMode } from "./templates/deckbox/template";
 
 const initialPlacement: ArtworkPlacement = {
   scale: 1,
@@ -41,7 +41,9 @@ export default function App() {
   const [artwork, setArtwork] = useState<ArtworkBySlot>(createInitialArtwork);
   const [activeSlot, setActiveSlot] = useState<ArtworkSlotId>("front");
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
+  const [sealingMode, setSealingMode] = useState<DeckboxSealingMode>("tongue");
   const [isExporting, setIsExporting] = useState(false);
+  const deckboxTemplate = useMemo(() => createDeckboxTemplate(sealingMode), [sealingMode]);
   const titleAdjective = useMemo(
     () => TITLE_ADJECTIVES[Math.floor(Math.random() * TITLE_ADJECTIVES.length)],
     [],
@@ -143,8 +145,10 @@ export default function App() {
           artwork={artwork}
           activeSlot={activeSlot}
           backgroundColor={backgroundColor}
+          sealingMode={sealingMode}
           onActiveSlotChange={setActiveSlot}
           onBackgroundColorChange={setBackgroundColor}
+          onSealingModeChange={setSealingMode}
           onImageChange={handleImageChange}
           onImageClear={handleImageClear}
           onExport={handleExport}

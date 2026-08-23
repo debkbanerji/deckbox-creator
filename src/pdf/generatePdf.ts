@@ -50,6 +50,7 @@ export async function createDeckboxPdf(template: BoxTemplate, options: PdfOption
   drawBackGlueAnnotations(pdf, template, layout.offset);
   drawScoreLines(pdf, template, layout.offset);
   drawCutLines(pdf, template, layout.offset);
+  drawMagnetGuides(pdf, template, layout.offset);
 
   return pdf;
 }
@@ -236,6 +237,19 @@ function drawCutLines(pdf: jsPDF, template: BoxTemplate, offset: PointMm) {
   pdf.setLineWidth(pdfLineWidthMm);
   drawPaths(pdf, template.cutPaths, offset);
   drawPaths(pdf, template.slotPaths, offset);
+}
+
+function drawMagnetGuides(pdf: jsPDF, template: BoxTemplate, offset: PointMm) {
+  if (!template.magnetPaths?.length) {
+    return;
+  }
+
+  pdf.saveGraphicsState();
+  pdf.setGState(new GState({ "stroke-opacity": 0.7 }));
+  pdf.setDrawColor(17, 24, 39);
+  pdf.setLineWidth(pdfLineWidthMm);
+  drawPaths(pdf, template.magnetPaths, offset);
+  pdf.restoreGraphicsState();
 }
 
 function drawPaths(pdf: jsPDF, paths: PathSegment[], offset: PointMm) {
