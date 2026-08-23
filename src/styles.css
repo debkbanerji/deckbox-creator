@@ -108,6 +108,10 @@ input:disabled {
   dominant-baseline: middle;
 }
 
+.glue-labels .is-panel-glue {
+  font-size: 3.1px;
+}
+
 .back-glue-annotations {
   fill: #000000;
   pointer-events: none;

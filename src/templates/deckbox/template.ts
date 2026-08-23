@@ -115,16 +115,22 @@ const rightCoverWingArtworkRect: RectMm = {
   y: lidTop,
 };
 const glueFlapRect: RectMm = { x: glueX, y: bodyTop, width: glueWidth, height: panelHeight };
+const glueFlapPoints: PointMm[] = [
+  { x: columnRight, y: bodyBottom },
+  { x: glueX + glueWidth, y: bodyBottom - glueWidth },
+  { x: glueX + glueWidth, y: bodyTop },
+  { x: columnRight, y: bodyTop },
+];
 const leftHingeFlapPoints: PointMm[] = [
   { x: columnRight, y: lidTop },
   { x: columnRight + 17, y: topPanelTop + 37 },
-  { x: columnRight + 15, y: topPanelTop + 14 },
+  { x: columnRight + 17, y: topPanelTop + 14 },
   { x: columnRight, y: topPanelTop },
 ];
 const rightHingeFlapPoints: PointMm[] = [
   { x: columnX, y: lidTop },
   { x: columnX - 17, y: topPanelTop + 37 },
-  { x: columnX - 15, y: topPanelTop + 14 },
+  { x: columnX - 17, y: topPanelTop + 14 },
   { x: columnX, y: topPanelTop },
 ];
 const bodyStripPoints: PointMm[] = [
@@ -578,7 +584,7 @@ export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"
     polygonRegion(leftHingeFlapPoints),
     polygonRegion(rightHingeFlapPoints),
     rectRegion(backPanel),
-    rectRegion(glueFlapRect),
+    polygonRegion(glueFlapPoints),
     bodyStripRegion,
     polygonRegion(backBottomFlapPoints),
     polygonRegion(leftSideBottomFlapPoints),
@@ -592,7 +598,7 @@ export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"
         polygonRegion(tongueSlotKnockoutPoints),
       ],
   glueRegions: [
-    rectRegion(insetRect(glueFlapRect, 4, 10)),
+    rectRegion(insetRect(glueFlapRect, 4, 20)),
     polygonRegion(scalePolygon(leftHingeFlapPoints, 0.58)),
     polygonRegion(scalePolygon(rightHingeFlapPoints, 0.58)),
     polygonRegion(rightHalfPolygon(scalePolygon(leftSideBottomFlapPoints, 0.58), 0.36, 1.75)),
@@ -643,12 +649,7 @@ export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"
     poly(rightHingeFlapPoints),
 
     // Left glue flap.
-    poly([
-      { x: columnRight, y: bodyBottom },
-      { x: glueX + glueWidth, y: bodyBottom },
-      { x: glueX + glueWidth, y: bodyTop },
-      { x: columnRight, y: bodyTop },
-    ]),
+    poly(glueFlapPoints),
 
     // Right-hand body strip, including the deep V-shaped receiving cut above the slot panel.
     bodyStripCut,

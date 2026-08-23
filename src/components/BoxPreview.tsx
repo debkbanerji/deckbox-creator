@@ -101,22 +101,17 @@ export function BoxPreview({
         </g>
 
         <g className="panel-labels">
-          {template.panels.map((panel) => (
-            <text
-              key={panel.id}
-              x={panel.rect.x + panel.rect.width / 2}
-              y={getPanelLabelY(template, panel.id, panel.rect.y, panel.rect.height)}
-              transform={
-                panel.id === "glue"
-                  ? `rotate(-90 ${panel.rect.x + panel.rect.width / 2} ${
-                      panel.rect.y + panel.rect.height / 2
-                    })`
-                  : undefined
-              }
-            >
-              {panel.label}
-            </text>
-          ))}
+          {template.panels
+            .filter((panel) => panel.id !== "glue")
+            .map((panel) => (
+              <text
+                key={panel.id}
+                x={panel.rect.x + panel.rect.width / 2}
+                y={getPanelLabelY(template, panel.id, panel.rect.y, panel.rect.height)}
+              >
+                {panel.label}
+              </text>
+            ))}
         </g>
 
         <g className="artwork-regions">
@@ -145,7 +140,13 @@ export function BoxPreview({
             }
 
             return (
-              <text key={index} x={center.x} y={center.y}>
+              <text
+                key={index}
+                className={index === 0 ? "is-panel-glue" : undefined}
+                x={center.x}
+                y={center.y}
+                transform={index === 0 ? `rotate(90 ${center.x} ${center.y})` : undefined}
+              >
                 GLUE
               </text>
             );

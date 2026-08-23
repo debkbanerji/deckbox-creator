@@ -186,18 +186,19 @@ function drawClipFills(
 
 function drawGlueLabels(pdf: jsPDF, template: BoxTemplate, offset: PointMm) {
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8.5);
   pdf.setTextColor(0, 0, 0);
 
-  template.glueRegions.forEach((region) => {
+  template.glueRegions.forEach((region, index) => {
     const center = getClipCenter(region);
     if (!center) {
       return;
     }
 
+    pdf.setFontSize(index === 0 ? 7 : 8.5);
     pdf.text("GLUE", center.x + offset.x, center.y + offset.y, {
       align: "center",
       baseline: "middle",
+      angle: index === 0 ? 270 : 0,
     });
   });
 }
