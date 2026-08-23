@@ -194,12 +194,21 @@ function drawGlueLabels(pdf: jsPDF, template: BoxTemplate, offset: PointMm) {
       return;
     }
 
-    pdf.setFontSize(index === 0 ? 7 : 8.5);
-    pdf.text("GLUE", center.x + offset.x, center.y + offset.y, {
-      align: "center",
-      baseline: "middle",
-      angle: index === 0 ? 270 : 0,
-    });
+    const fontSize = index === 0 ? 7 : 8.5;
+    pdf.setFontSize(fontSize);
+    const textDimensions = pdf.getTextDimensions("GLUE");
+    const panelGlueXOffset = index === 0 ? textDimensions.h : 0;
+    const panelGlueYOffset = index === 0 ? -textDimensions.w / 2 - 0.8 : 0;
+    pdf.text(
+      "GLUE",
+      center.x + offset.x + panelGlueXOffset,
+      center.y + offset.y + panelGlueYOffset,
+      {
+        align: "center",
+        baseline: "middle",
+        angle: index === 0 ? 270 : 0,
+      },
+    );
   });
 }
 
