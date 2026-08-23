@@ -12,6 +12,7 @@ dist
 dist-ssr
 coverage
 .vite
+test-assets/
 *.local
 .env
 .env.*
