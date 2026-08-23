@@ -168,6 +168,14 @@ const frontMagnetCircleCenter = {
   x: frontMagnetTab.x + frontMagnetTab.width / 2,
   y: frontMagnetTab.y + frontMagnetTab.height / 2,
 };
+const frontMagnetLeftEdgeY =
+  vRightShoulder.y +
+  ((frontX - vRightShoulder.x) / (frontMagnetTabLeftTop.x - vRightShoulder.x)) *
+    (frontMagnetTabLeftTop.y - vRightShoulder.y);
+const frontMagnetRightEdgeY =
+  frontMagnetTabRightTop.y +
+  ((rightSideX - frontMagnetTabRightTop.x) / (vLeftShoulder.x - frontMagnetTabRightTop.x)) *
+    (vLeftShoulder.y - frontMagnetTabRightTop.y);
 const topMagnetCircleCenter = {
   x: columnX + panelWidth / 2,
   y: tongueTop + tongueHeight / 2,
@@ -406,6 +414,19 @@ const topMagnetTabCutD = bottomRoundedRectCutPath(
   4.4,
 );
 const frontMagnetTabD = bottomRoundedRectPath(frontMagnetTab, frontMagnetTab.radius);
+const frontMagnetArtworkD = `
+  M ${frontX} ${bodyTop}
+  L ${rightSideX} ${bodyTop}
+  L ${rightSideX} ${frontMagnetRightEdgeY}
+  L ${frontMagnetTabRightTop.x} ${frontMagnetTabRightTop.y}
+  L ${frontMagnetTab.x + frontMagnetTab.width} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius}
+  C ${frontMagnetTab.x + frontMagnetTab.width} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius * 0.45}, ${frontMagnetTab.x + frontMagnetTab.width - frontMagnetTab.radius * 0.45} ${frontMagnetTab.y + frontMagnetTab.height}, ${frontMagnetTab.x + frontMagnetTab.width - frontMagnetTab.radius} ${frontMagnetTab.y + frontMagnetTab.height}
+  L ${frontMagnetTab.x + frontMagnetTab.radius} ${frontMagnetTab.y + frontMagnetTab.height}
+  C ${frontMagnetTab.x + frontMagnetTab.radius * 0.45} ${frontMagnetTab.y + frontMagnetTab.height}, ${frontMagnetTab.x} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius * 0.45}, ${frontMagnetTab.x} ${frontMagnetTab.y + frontMagnetTab.height - frontMagnetTab.radius}
+  L ${frontMagnetTabLeftTop.x} ${frontMagnetTabLeftTop.y}
+  L ${frontX} ${frontMagnetLeftEdgeY}
+  Z
+`;
 const magnetBodyStripD = `
   M ${columnX} ${bodyBottom}
   L ${vLeftShoulder.x} ${vLeftShoulder.y}
@@ -509,7 +530,7 @@ export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"
     {
       id: "front",
       slot: "front",
-      clip: { type: "rect", rect: frontPanel },
+      clip: isMagnetMode ? { type: "path", d: frontMagnetArtworkD } : { type: "rect", rect: frontPanel },
       anchorRect: frontPanel,
       renderRect: frontPanel,
       rotationDegrees: 180,

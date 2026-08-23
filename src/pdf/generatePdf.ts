@@ -25,7 +25,7 @@ type PdfPathOp = {
   c: number[];
 };
 
-const pdfLineWidthMm = 0.25;
+const pdfLineWidthMm = 0.15;
 
 export async function downloadDeckboxPdf(template: BoxTemplate, options: PdfOptions) {
   const pdf = await createDeckboxPdf(template, options);
