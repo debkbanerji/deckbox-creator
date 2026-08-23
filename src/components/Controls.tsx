@@ -41,6 +41,20 @@ export function Controls({
 }: Props) {
   return (
     <aside className="controls" aria-label="Box controls">
+
+      <div className="color-control">
+        <div className="control-row">
+          <label htmlFor="background-color">Background</label>
+          <span>{backgroundColor.toUpperCase()}</span>
+        </div>
+        <input
+          id="background-color"
+          type="color"
+          value={backgroundColor}
+          onChange={(event) => onBackgroundColorChange(event.target.value)}
+        />
+      </div>
+
       <div className="artwork-slots">
         {uploadSlots.map((slot) => {
           const slotArtwork = artwork[slot.id];
@@ -104,23 +118,9 @@ export function Controls({
         })}
       </div>
 
-      <div className="color-control">
-        <div className="control-row">
-          <label htmlFor="background-color">Background</label>
-          <span>{backgroundColor.toUpperCase()}</span>
-        </div>
-        <input
-          id="background-color"
-          type="color"
-          value={backgroundColor}
-          onChange={(event) => onBackgroundColorChange(event.target.value)}
-        />
-      </div>
-
       <div className="mode-control" aria-label="Closure mode">
         <div className="control-row">
-          <span>Closure</span>
-          <span>{sealingMode === "tongue" ? "Insert" : "Magnet"}</span>
+          <span>Closure Mechanism</span>
         </div>
         <div className="segmented-control">
           <button
