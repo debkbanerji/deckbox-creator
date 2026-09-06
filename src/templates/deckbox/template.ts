@@ -181,6 +181,7 @@ const topMagnetCircleCenter = {
   y: tongueTop + tongueHeight / 2,
 };
 const magnetCircleRadius = 3;
+const magnetPairXOffset = 6;
 const backBottomFlapPoints: PointMm[] = [
   { x: columnRight, y: bodyTop },
   { x: columnX, y: bodyTop },
@@ -465,10 +466,11 @@ const magnetVoidKnockouts: ArtworkClip[] = [
     frontMagnetTabLeftBottom,
   ]),
 ];
-const magnetGuidePaths = [
-  path(circlePath(topMagnetCircleCenter, magnetCircleRadius)),
-  path(circlePath(frontMagnetCircleCenter, magnetCircleRadius)),
-];
+const magnetGuidePaths = [topMagnetCircleCenter, frontMagnetCircleCenter].flatMap((center) =>
+  [-magnetPairXOffset, magnetPairXOffset].map((xOffset) =>
+    path(circlePath({ x: center.x + xOffset, y: center.y }, magnetCircleRadius)),
+  ),
+);
 
 export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"): BoxTemplate => {
   const isMagnetMode = sealingMode === "magnets";

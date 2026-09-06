@@ -135,7 +135,7 @@ export function Controls({
             className={sealingMode === "magnets" ? "is-active" : undefined}
             onClick={() => onSealingModeChange("magnets")}
           >
-            Magnet
+            Magnets
           </button>
         </div>
       </div>
