@@ -2,6 +2,9 @@ import type { ArtworkClip, BoxTemplate, PathSegment, PointMm, RectMm } from "../
 
 export type DeckboxSealingMode = "tongue" | "magnets";
 
+const lineYAtX = (from: PointMm, to: PointMm, x: number) =>
+  from.y + ((x - from.x) / (to.x - from.x)) * (to.y - from.y);
+
 const pageWidthMm = 431.8;
 const pageHeightMm = 279.4;
 
@@ -40,6 +43,8 @@ const frontCenterX = frontX + panelWidth / 2;
 const vApex = { x: frontCenterX, y: bodyTop + panelHeight - 53 };
 const vLeftShoulder = { x: columnX, y: bodyBottom };
 const vRightShoulder = { x: outerSideX, y: bodyBottom };
+const insertOuterSideCutY = lineYAtX(vRightShoulder, vApex, frontX);
+const insertRightSideCutY = lineYAtX(vApex, vLeftShoulder, rightSideX);
 const lidWingWidth = depth;
 
 const backPanel: RectMm = {
@@ -570,7 +575,18 @@ export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"
     {
       id: "right-side",
       slot: "leftSide",
-      clip: { type: "rect", rect: rightSidePanel },
+      clip: {
+        type: "polygon",
+        points: [
+          { x: rightSideX, y: bodyTop },
+          { x: columnX, y: bodyTop },
+          { x: columnX, y: bodyBottom },
+          {
+            x: rightSideX,
+            y: isMagnetMode ? frontMagnetRightEdgeY : insertRightSideCutY,
+          },
+        ],
+      },
       anchorRect: rightSidePanel,
       renderRect: rightSidePanel,
       rotationDegrees: 180,
@@ -578,7 +594,18 @@ export const createDeckboxTemplate = (sealingMode: DeckboxSealingMode = "tongue"
     {
       id: "outer-side",
       slot: "rightSide",
-      clip: { type: "rect", rect: outerSidePanel },
+      clip: {
+        type: "polygon",
+        points: [
+          { x: outerSideX, y: bodyTop },
+          { x: frontX, y: bodyTop },
+          {
+            x: frontX,
+            y: isMagnetMode ? frontMagnetLeftEdgeY : insertOuterSideCutY,
+          },
+          { x: outerSideX, y: bodyBottom },
+        ],
+      },
       anchorRect: outerSidePanel,
       renderRect: outerSidePanel,
       rotationDegrees: 180,
