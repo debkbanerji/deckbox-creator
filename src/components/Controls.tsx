@@ -140,10 +140,13 @@ export function Controls({
         </div>
       </div>
 
-      <button className="export-button" type="button" onClick={onExport} disabled={isExporting}>
-        <FiDownload aria-hidden />
-        {isExporting ? "Downloading PDF" : "Download PDF"}
-      </button>
+      <div className="export-control">
+        <button className="export-button" type="button" onClick={onExport} disabled={isExporting}>
+          <FiDownload aria-hidden />
+          {isExporting ? "Downloading PDF" : "Download PDF"}
+        </button>
+        <p className="export-note">PDF designed to be printed on 11″ × 17″ cardstock</p>
+      </div>
     </aside>
   );
 }
