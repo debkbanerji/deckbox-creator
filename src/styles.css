@@ -402,8 +402,9 @@ input:disabled {
   gap: 8px;
 }
 
+.mode-note,
 .export-note {
-  margin: 0;
+  margin: -4px 0 0;
   color: #687385;
   font-size: 12px;
   line-height: 1.4;

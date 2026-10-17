@@ -51,6 +51,7 @@ export async function createDeckboxPdf(template: BoxTemplate, options: PdfOption
   drawScoreLines(pdf, template, layout.offset);
   drawCutLines(pdf, template, layout.offset);
   drawMagnetGuides(pdf, template, layout.offset);
+  drawDesignCredit(pdf, layout.page);
 
   return pdf;
 }
@@ -73,6 +74,18 @@ function choosePdfLayout(template: BoxTemplate): PdfLayout {
 function fillPage(pdf: jsPDF, page: PdfPage) {
   pdf.setFillColor(255, 255, 255);
   pdf.rect(0, 0, page.widthMm, page.heightMm, "F");
+}
+
+function drawDesignCredit(pdf: jsPDF, page: PdfPage) {
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(14);
+  pdf.setTextColor(23, 32, 42);
+  const lines = ["Created with", "deckbox.debkbanerji.com"];
+  const textHeight = pdf.getTextDimensions(lines.join("\n")).h;
+  pdf.text(lines, page.widthMm / 4 + 15, page.heightMm * 0.75 - 15 - textHeight / 2, {
+    align: "center",
+    baseline: "top",
+  });
 }
 
 function drawBackgrounds(

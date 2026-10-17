@@ -138,6 +138,11 @@ export function Controls({
             Magnets
           </button>
         </div>
+        <p className="mode-note" aria-live="polite">
+          {sealingMode === "tongue"
+            ? "Less durable than magnet version"
+            : "Requires some small magnets to build"}
+        </p>
       </div>
 
       <div className="export-control">
