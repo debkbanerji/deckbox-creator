@@ -117,6 +117,25 @@ export default function App() {
       <header className="app-header">
         <div>
           <h1>{appTitle}</h1>
+          <p className="app-subheader">
+            <span>Made with ♥</span>
+            {"  •  "}
+            <a
+              href="https://github.com/debkbanerji/deckbox-creator"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Source Code
+            </a>
+            {"  •  "}
+            <a
+              href="https://github.com/debkbanerji#contact-me"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Contact
+            </a>
+          </p>
         </div>
       </header>
 
